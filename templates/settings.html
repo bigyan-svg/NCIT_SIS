@@ -53,21 +53,6 @@
         box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
     }
 
-    .btn-return {
-        background: #f8f9fc;
-        color: #858796;
-        border: 1px solid #e3e6f0;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .btn-return:hover {
-        background: #eaecf4;
-        color: #5a5c69;
-        text-decoration: none;
-    }
-
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -123,7 +108,7 @@
                             </button>
                             
                             {% set role = session.get('role', 'student') %}
-                            <a href="{{ url_for(role ~ '_dashboard') }}" class="btn btn-return text-center">
+                            <a href="{{ url_for(role ~ '_dashboard') }}" class="btn btn-dashboard-return text-center">
                                 <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
                             </a>
                         </div>
