@@ -4,28 +4,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap");
 
 :root {
-    --bg-0: #f8fafc;
-    --bg-1: #f1f5f9;
-    --ink: #0f172a;
+    --bg-0: #f6f9fc;
+    --bg-1: #eef3f8;
+    --ink: #0b1220;
     --ink-2: #1f2937;
-    --muted: #64748b;
-    --card: rgba(255, 255, 255, 0.82);
+    --muted: #6b7280;
+    --card: rgba(255, 255, 255, 0.84);
     --card-solid: #ffffff;
-    --line: rgba(15, 23, 42, 0.08);
-    --accent: #0ea5a3;
-    --accent-2: #14b8a6;
+    --line: rgba(15, 23, 42, 0.09);
+    --accent: #00b7ff;
+    --accent-2: #2dd4bf;
+    --accent-3: #3b82f6;
     --success: #22c55e;
     --warning: #f59e0b;
     --danger: #ef4444;
     --sidebar-w: 260px;
-    --header-h: 70px;
-    --radius: 14px;
-    --radius-sm: 10px;
-    --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.08);
-    --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.12);
-    --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.16);
-    --glow: 0 0 0 6px rgba(14, 165, 163, 0.12);
+    --header-h: 72px;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow-sm: 0 6px 14px rgba(11, 18, 32, 0.08);
+    --shadow-md: 0 16px 36px rgba(11, 18, 32, 0.12);
+    --shadow-lg: 0 28px 70px rgba(11, 18, 32, 0.18);
+    --glow: 0 0 0 6px rgba(0, 183, 255, 0.16);
     --transition: 180ms ease;
+    --gradient-primary: linear-gradient(135deg, #00b7ff, #2dd4bf);
+    --gradient-deep: linear-gradient(135deg, #0f172a, #0b1220);
 
     /* Bootstrap theme overrides */
     --bs-body-font-family: "Space Grotesk", sans-serif;
@@ -37,9 +40,9 @@
     --bs-info: #38bdf8;
     --bs-warning: var(--warning);
     --bs-danger: var(--danger);
-    --bs-dark: #0f172a;
+    --bs-dark: #0b1220;
     --bs-border-color: var(--line);
-    --bs-border-radius: 0.8rem;
+    --bs-border-radius: 0.85rem;
 }
 
 * {
@@ -58,8 +61,9 @@ body {
     color: var(--ink);
     line-height: 1.6;
     background-image:
-        radial-gradient(1200px 600px at 10% -10%, rgba(14, 165, 163, 0.20), transparent 60%),
-        radial-gradient(900px 600px at 90% 10%, rgba(245, 158, 11, 0.18), transparent 60%),
+        radial-gradient(1200px 600px at 10% -10%, rgba(0, 183, 255, 0.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(45, 212, 191, 0.18), transparent 60%),
+        radial-gradient(900px 600px at 60% 110%, rgba(59, 130, 246, 0.12), transparent 60%),
         linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 100%);
     background-attachment: fixed;
     position: relative;
@@ -76,6 +80,19 @@ body::before {
         linear-gradient(transparent 0 31px, rgba(15, 23, 42, 0.03) 32px),
         linear-gradient(90deg, transparent 0 31px, rgba(15, 23, 42, 0.03) 32px);
     background-size: 32px 32px;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.12;
+    background-image:
+        radial-gradient(240px 240px at 20% 30%, rgba(0, 183, 255, 0.35), transparent 65%),
+        radial-gradient(260px 260px at 85% 18%, rgba(45, 212, 191, 0.35), transparent 65%),
+        radial-gradient(280px 280px at 70% 80%, rgba(59, 130, 246, 0.35), transparent 65%);
 }
 
 img {
@@ -99,7 +116,7 @@ h1, h2, h3, h4 {
    ========================================= */
 .sidebar {
     width: var(--sidebar-w);
-    background: linear-gradient(180deg, #0f172a 0%, #111827 60%, #0b1220 100%);
+    background: linear-gradient(180deg, #0b1220 0%, #111827 60%, #0b1220 100%);
     color: #e2e8f0;
     position: fixed;
     top: 0;
@@ -117,7 +134,7 @@ h1, h2, h3, h4 {
     font-size: 1.4rem;
     font-weight: 700;
     text-align: center;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     letter-spacing: 0.6px;
 }
@@ -160,9 +177,9 @@ h1, h2, h3, h4 {
 
 .menu li a:hover,
 .menu li a.active {
-    background: rgba(14, 165, 163, 0.18);
+    background: rgba(0, 183, 255, 0.18);
     color: #ffffff;
-    border-color: rgba(14, 165, 163, 0.35);
+    border-color: rgba(0, 183, 255, 0.35);
 }
 
 .menu li a:hover::before,
@@ -183,7 +200,7 @@ h1, h2, h3, h4 {
 }
 
 .logout a {
-    color: #fca5a5 !important;
+    color: #fecaca !important;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -224,7 +241,7 @@ h1, h2, h3, h4 {
     align-items: center;
     gap: 18px;
     margin-bottom: 26px;
-    background: var(--card);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82));
     padding: 22px 24px;
     border-radius: var(--radius);
     border: 1px solid var(--line);
@@ -234,10 +251,21 @@ h1, h2, h3, h4 {
     top: 0;
     z-index: 5;
     min-height: var(--header-h);
+    overflow: hidden;
+}
+
+.header::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gradient-primary);
 }
 
 .card {
-    background: var(--card);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.86));
     padding: 24px;
     border-radius: var(--radius);
     border: 1px solid var(--line);
@@ -245,6 +273,20 @@ h1, h2, h3, h4 {
     margin-bottom: 24px;
     backdrop-filter: blur(10px);
     transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    left: -40%;
+    top: -60%;
+    width: 160%;
+    height: 160%;
+    background: radial-gradient(circle, rgba(0, 183, 255, 0.10), transparent 60%);
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .card:hover {
@@ -292,7 +334,7 @@ button {
     cursor: pointer;
     font-weight: 600;
     transition: var(--transition);
-    box-shadow: 0 12px 24px rgba(14, 165, 163, 0.25);
+    box-shadow: 0 12px 24px rgba(0, 183, 255, 0.22);
 }
 
 button:hover {
@@ -318,19 +360,19 @@ button:active {
 }
 
 .btn-add {
-    background: linear-gradient(135deg, #0f172a, #1f2937);
+    background: var(--gradient-deep);
     padding: 10px 18px;
     margin-bottom: 16px;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
 }
 
 .btn-edit {
-    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    background: linear-gradient(135deg, #00b7ff, #3b82f6);
     margin-right: 6px;
 }
 
 .btn-delete {
-    background: linear-gradient(135deg, #fb7185, #ef4444);
+    background: linear-gradient(135deg, #ef4444, #fb7185);
 }
 
 /* Return Dashboard Button */
@@ -395,9 +437,9 @@ button:active {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: var(--gradient-primary);
     border: none;
-    box-shadow: 0 10px 22px rgba(14, 165, 163, 0.25);
+    box-shadow: 0 10px 22px rgba(0, 183, 255, 0.25);
 }
 
 .btn-primary:hover {
@@ -670,7 +712,7 @@ table tbody tr:hover,
     top: -30px;
     width: 120px;
     height: 120px;
-    background: rgba(14, 165, 163, 0.15);
+    background: rgba(0, 183, 255, 0.18);
     border-radius: 50%;
 }
 
@@ -680,12 +722,12 @@ table tbody tr:hover,
 }
 
 .stat-box.bg-blue {
-    background: linear-gradient(135deg, #0ea5a3, #14b8a6);
+    background: linear-gradient(135deg, #00b7ff, #3b82f6);
     color: #fff;
 }
 
 .stat-box.bg-green {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #22c55e, #10b981);
     color: #fff;
 }
 
@@ -696,7 +738,7 @@ table tbody tr:hover,
 
 .stat-box.bg-red,
 .stat-box.bg-danger {
-    background: linear-gradient(135deg, #ef4444, #f97316);
+    background: linear-gradient(135deg, #ef4444, #fb7185);
     color: #fff;
 }
 
@@ -860,6 +902,42 @@ table tbody tr:hover,
 .bg-success { background: var(--success); color: #fff; }
 .bg-warning { background: var(--warning); color: #fff; }
 .bg-danger { background: var(--danger); color: #fff; }
+
+/* Gradient helpers used in dashboards */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #00b7ff, #3b82f6);
+    color: #fff;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    color: #fff;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: #fff;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: #fff;
+}
+
+.bg-gradient-blue {
+    background: linear-gradient(135deg, #00b7ff, #3b82f6);
+    color: #fff;
+}
+
+.bg-gradient-green {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+}
+
+.bg-gradient-red {
+    background: linear-gradient(135deg, #ef4444, #fb7185);
+    color: #fff;
+}
 
 /* =========================================
    MOTION
