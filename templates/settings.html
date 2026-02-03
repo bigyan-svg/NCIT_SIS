@@ -122,7 +122,8 @@
                                 <i class="fas fa-save me-2"></i>Update Password
                             </button>
                             
-                            <a href="javascript:history.back()" class="btn btn-return text-center">
+                            {% set role = session.get('role', 'student') %}
+                            <a href="{{ url_for(role ~ '_dashboard') }}" class="btn btn-return text-center">
                                 <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
                             </a>
                         </div>
