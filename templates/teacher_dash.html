@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Portal | Dashboard{% endblock %}
+
+{% block sidebar %}
+    <li><a href="{{ url_for('teacher_dashboard') }}" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+    <li><a href="{{ url_for('teacher_classes') }}"><i class="fas fa-chalkboard-teacher"></i> My Classes</a></li>
+    {% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Instructor Dashboard</h3>
+            <p class="text-muted small mb-0">Overview of your academic activities.</p>
+        </div>
+        <div class="d-none d-sm-block">
+            <span class="badge bg-white text-dark border shadow-sm py-2 px-3">
+                <i class="far fa-calendar-alt me-2 text-primary"></i> {{ today|default('Today') }}
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-6 col-md-6">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-left: 5px solid #4e73df !important; border-radius: 12px;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Assigned Classes</div>
+                            <div class="h3 mb-0 font-weight-bold text-gray-800">{{ classes_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chalkboard fa-2x text-gray-300" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-md-6">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-left: 5px solid #1cc88a !important; border-radius: 12px;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Account Status</div>
+                            <div class="h3 mb-0 font-weight-bold text-gray-800">Active</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300" style="color: #dddfeb;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center justify-content-between">
+                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-bullhorn me-2 text-warning"></i>Faculty Notices</h6>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for n in notices %}
+                        <div class="list-group-item p-4 border-bottom-0" style="border-bottom: 1px solid #f0f0f0 !important;">
+                            <div class="d-flex w-100 justify-content-between mb-2">
+                                <h6 class="mb-1 fw-bold text-primary">{{ n[1] }}</h6>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i> Recent</small>
+                            </div>
+                            <p class="mb-1 text-secondary small" style="line-height: 1.6;">{{ n[2] }}</p>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-muted opacity-25 mb-3"></i>
+                            <p class="text-muted">No new notices for faculty at this time.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

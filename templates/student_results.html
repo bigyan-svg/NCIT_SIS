@@ -1,0 +1,139 @@
+{% extends 'student_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Academic Transcript</h3>
+            <p class="text-muted small mb-0">Official record of your examination results.</p>
+        </div>
+        <div>
+            <button onclick="window.print()" class="btn btn-dark shadow-sm d-print-none">
+                <i class="fas fa-print me-2"></i>Print Transcript
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" id="transcript-card" style="border-radius: 16px; overflow: hidden;">
+        
+        <div class="card-header bg-white py-4 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="m-0 fw-bold text-primary"><i class="fas fa-certificate me-2"></i>Grade Sheet</h5>
+            <span class="badge bg-light text-dark border">Generated: {{ now|default('Today') }}</span>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Course Code</th>
+                            <th style="width: 30%;">Course Title</th>
+                            <th>Exam Type</th>
+                            <th class="text-center">Score / Total</th>
+                            <th class="text-center">Grade</th>
+                            <th class="text-end pe-4">GPA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="font-monospace text-secondary">{{ r[0] }}</span>
+                            </td>
+                            
+                            <td>
+                                <span class="fw-bold text-dark">{{ r[1] }}</span>
+                            </td>
+                            
+                            <td>
+                                <span class="badge bg-light text-secondary border fw-normal">{{ r[6] }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="fw-bold text-dark">{{ r[2] }}</span>
+                                <span class="text-muted small mx-1">/</span>
+                                <span class="text-muted small">{{ r[3] }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                {% set is_pass = (r[4] != 'F') %}
+                                <span class="badge {{ 'bg-success bg-opacity-10 text-success border-success' if is_pass else 'bg-danger bg-opacity-10 text-danger border-danger' }} border px-3 rounded-pill">
+                                    {{ r[4] }}
+                                </span>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <span class="fw-bold fs-6 {{ 'text-dark' if is_pass else 'text-danger' }}">
+                                    {{ r[5] }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-file-alt fa-3x text-muted opacity-25"></i>
+                                </div>
+                                <h6 class="fw-bold text-muted">No Results Available</h6>
+                                <p class="small text-muted mb-0">Results have not been published yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-top py-3 px-4">
+            <div class="row">
+                <div class="col-md-6 text-muted small">
+                    <i class="fas fa-info-circle me-1"></i> Grading Scale: 4.0 (A) to 0.0 (F)
+                </div>
+                <div class="col-md-6 text-end small fw-bold text-uppercase text-muted">
+                    End of Report
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Print Specific Styles */
+    @media print {
+        /* Hide everything by default */
+        body * {
+            visibility: hidden;
+        }
+        
+        /* Unhide the Transcript Card and its children */
+        #transcript-card, #transcript-card * {
+            visibility: visible;
+        }
+
+        /* Position the card to fill the page */
+        #transcript-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Ensure background colors (badges) print correctly */
+        .badge {
+            border: 1px solid #000 !important; /* Force border for contrast */
+            color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* Hide buttons specifically */
+        .btn, .d-print-none {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

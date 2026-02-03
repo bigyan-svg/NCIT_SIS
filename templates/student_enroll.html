@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Portal | Enrollment{% endblock %}
+
+{% block sidebar %}
+    <li><a href="{{ url_for('student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+    <li><a href="{{ url_for('student_enroll') }}" class="active"><i class="fas fa-edit"></i> Enroll Course</a></li>
+    <li><a href="{{ url_for('student_results') }}"><i class="fas fa-graduation-cap"></i> Results</a></li>
+    <li><a href="{{ url_for('student_attendance') }}"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+    <li><a href="{{ url_for('student_fees') }}"><i class="fas fa-receipt"></i> Fees</a></li>
+    <li><a href="{{ url_for('student_exams') }}"><i class="fas fa-calendar-alt"></i> Exam Schedule</a></li>
+    <li><a href="{{ url_for('library_view') }}"><i class="fas fa-book"></i> Library</a></li>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Page Specific Styles */
+    .enroll-card {
+        border-radius: 16px;
+        border: none;
+        transition: transform 0.3s;
+    }
+    
+    .course-select-wrapper {
+        background: #f8f9fc;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px dashed #d1d3e2;
+    }
+
+    .table-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .course-badge {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        background: rgba(78, 115, 223, 0.1);
+        color: #4e73df;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Course Enrollment</h3>
+            <p class="text-muted small mb-0">Manage your academic subjects for this semester.</p>
+        </div>
+        <div class="d-none d-md-block">
+            <span class="badge bg-white text-primary border shadow-sm py-2 px-3">
+                <i class="fas fa-university me-2"></i> Current Session
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-5">
+            <div class="card enroll-card shadow-sm h-100">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h6 class="m-0 fw-bold text-success"><i class="fas fa-plus-circle me-2"></i>Enroll New Course</h6>
+                </div>
+                
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    {% if available %}
+                        <div class="mb-3">
+                            <h5 class="fw-bold text-dark">Select a Subject</h5>
+                            <p class="text-muted small">Choose from the available courses offered by your department below.</p>
+                        </div>
+
+                        <form method="POST" class="course-select-wrapper">
+                            <label for="course_id" class="form-label fw-bold small text-uppercase text-secondary">Available Courses</label>
+                            
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-book"></i></span>
+                                <select id="course_id" name="course_id" class="form-select border-start-0 ps-0" required>
+                                    <option value="" selected disabled>-- Choose a Course --</option>
+                                    {% for c in available %}
+                                        <option value="{{ c.course_id }}">{{ c.course_code }} - {{ c.course_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 shadow-sm fw-bold">
+                                <i class="fas fa-check-circle me-2"></i> Confirm Enrollment
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-check-double fa-4x text-success opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold text-success">All Caught Up!</h5>
+                            <p class="text-muted small">You have successfully enrolled in all available courses for your department.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card table-card h-100">
+                <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 fw-bold text-primary"><i class="fas fa-list-alt me-2"></i>My Enrolled Courses</h6>
+                    <span class="badge bg-light text-dark border">{{ enrolled|length }} Active</span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-uppercase small text-muted">
+                                <tr>
+                                    <th class="ps-4 py-3">Course Detail</th>
+                                    <th>Enrolled Date</th>
+                                    <th class="text-end pe-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in enrolled %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="course-badge me-3">
+                                                {{ c.course_code[:2] }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ c.course_name }}</div>
+                                                <div class="small text-muted">{{ c.course_code }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-dark">
+                                            <i class="far fa-calendar-alt me-2 text-muted"></i>
+                                            {{ c.date_enrolled or 'N/A' }}
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3">
+                                            Active
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i><br>
+                                        You haven't enrolled in any courses yet.<br>
+                                        <small>Use the form on the left to get started.</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

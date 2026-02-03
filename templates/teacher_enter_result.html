@@ -1,0 +1,147 @@
+{% extends 'teacher_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Grading Portal</h3>
+            <p class="text-muted small mb-0">Course: <span class="fw-bold text-primary">{{ course[1] }}</span></p>
+        </div>
+        <div>
+            <a href="{{ url_for('teacher_classes') }}" class="btn btn-outline-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Back to Classes
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 16px;">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h6 class="m-0 fw-bold text-success"><i class="fas fa-edit me-2"></i>New Entry</h6>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" class="row g-3">
+                        
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted"><i class="fas fa-user-graduate me-1"></i> Student</label>
+                            <select name="student_id" class="form-select" required>
+                                <option value="" selected disabled>-- Select Student --</option>
+                                {% for s in students %}
+                                <option value="{{ s[0] }}">{{ s[1] }} (ID: {{ s[2] }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted"><i class="fas fa-tag me-1"></i> Assessment Type</label>
+                            <select name="exam_type" class="form-select" required>
+                                <option value="Unit Test 1">Unit Test 1</option>
+                                <option value="Unit Test 2">Unit Test 2</option>
+                                <option value="Mid Term">Mid Term</option>
+                                <option value="Pre Board">Pre Board</option>
+                                <option value="Final">Final Exam</option>
+                                <option value="Assignment">Assignment</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted"><i class="fas fa-star-half-alt me-1"></i> Obtained</label>
+                            <input type="number" step="0.01" min="0" name="marks" class="form-control" placeholder="0.00" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted"><i class="fas fa-star me-1"></i> Total</label>
+                            <input type="number" step="0.01" min="0" name="full_marks" class="form-control" placeholder="100" required>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i> Save Result
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 16px;">
+                <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-list-ol me-2 text-primary"></i>Recorded Results</h6>
+                    {% if results %}
+                    <span class="badge bg-light text-dark border">{{ results|length }} Entries</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-uppercase small text-muted">
+                                <tr>
+                                    <th class="ps-4 py-3">Student Name</th>
+                                    <th>Exam</th>
+                                    <th class="text-center">Score</th>
+                                    <th class="text-center">Grade</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in results %}
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        {{ r[0] }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-light text-secondary border fw-normal">{{ r[5] }}</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <span class="fw-bold text-dark">{{ r[1] }} <span class="text-muted fw-normal">/ {{ r[2] }}</span></span>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        {% set is_pass = (r[3] != 'F') %}
+                                        <div class="d-inline-flex align-items-center">
+                                            <span class="badge {{ 'bg-success bg-opacity-10 text-success border-success' if is_pass else 'bg-danger bg-opacity-10 text-danger border-danger' }} border px-2 py-1 rounded-pill me-2">
+                                                {{ r[3] }}
+                                            </span>
+                                            <small class="text-muted fw-bold">GPA {{ r[4]|round(1) }}</small>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-end pe-4">
+                                        <a href="{{ url_for('teacher_delete_result', result_id=r[6]) }}" 
+                                           class="btn btn-outline-danger btn-sm border-0" 
+                                           title="Delete Entry"
+                                           onclick="return confirm('Are you sure you want to delete this result?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="mb-3">
+                                            <i class="fas fa-clipboard-list fa-3x text-muted opacity-25"></i>
+                                        </div>
+                                        <h6 class="fw-bold text-muted">No Grades Entered</h6>
+                                        <p class="small text-muted mb-0">Use the form on the left to add results for this course.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

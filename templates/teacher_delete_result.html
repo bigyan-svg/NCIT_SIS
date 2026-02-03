@@ -1,0 +1,36 @@
+{% extends 'teacher_dash.html' %}
+{% block content %}
+
+<div class="header">
+    <h3>Confirm Delete Result</h3>
+    <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="badge bg-dark">Back to Grading</a>
+</div>
+
+<div class="card">
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+        <p><strong>Are you sure you want to permanently delete this result?</strong> This action cannot be undone.</p>
+        
+        <ul style="list-style: none; padding: 0; margin: 15px 0;">
+            <li><strong>Course:</strong> {{ course_name }}</li>
+            <li><strong>Student:</strong> {{ student_name }}</li>
+            <li><strong>Exam Type:</strong> <span class="badge bg-orange">{{ exam_type }}</span></li>
+            <li><strong>Marks Obtained:</strong> {{ marks_obtained }} / {{ full_marks }}</li>
+            <li><strong>Grade:</strong> 
+                <span class="badge {{ 'bg-green' if grade != 'F' else 'bg-red' }}">{{ grade }}</span>
+            </li>
+            <li><strong>GPA:</strong> <strong>{{ gpa }}</strong></li>
+        </ul>
+    </div>
+
+    <form method="POST">
+        <button type="submit" class="badge bg-red" style="font-size: 1em; padding: 10px 20px;">
+            Confirm Delete
+        </button>
+        <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" 
+           class="badge bg-dark" style="font-size: 1em; padding: 10px 20px; margin-left: 10px;">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

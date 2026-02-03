@@ -1,0 +1,75 @@
+{% extends 'student_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Exam Schedule</h3>
+            <p class="text-muted small mb-0">View dates and venues for your upcoming examinations.</p>
+        </div>
+        <div class="bg-white px-3 py-2 rounded shadow-sm border d-none d-sm-block">
+            <i class="fas fa-exclamation-circle text-warning me-2"></i>
+            <small class="fw-bold text-muted">Please arrive 15 mins early.</small>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="m-0 fw-bold text-danger"><i class="far fa-calendar-alt me-2"></i>Upcoming Sessions</h6>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Date & Time</th>
+                            <th>Course Name</th>
+                            <th class="text-end pe-4">Venue / Room</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in exams %}
+                        <tr>
+                            <td class="ps-4 py-3" style="width: 30%;">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded text-center border p-2 me-3" style="min-width: 50px;">
+                                        <i class="far fa-calendar text-primary mb-1 d-block"></i>
+                                        <span class="fw-bold small text-dark d-block">{{ e[1] }}</span>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted text-uppercase mb-1">Start Time</div>
+                                        <div class="fw-bold text-dark"><i class="far fa-clock text-warning me-1"></i> {{ e[2] }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="fw-bold text-dark fs-6">{{ e[0] }}</span>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">
+                                    <i class="fas fa-map-marker-alt me-1"></i> Room {{ e[3] }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-mug-hot fa-3x text-success opacity-25"></i>
+                                </div>
+                                <h6 class="fw-bold text-muted">Relax! No Exams Scheduled.</h6>
+                                <p class="small text-muted mb-0">Enjoy your free time or prepare for upcoming classes.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

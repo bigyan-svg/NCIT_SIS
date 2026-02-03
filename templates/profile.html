@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="mb-3">
+                <a href="{{ url_for(user.role ~ '_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm mb-3" 
+                         style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                        {{ user.full_name[0].upper() if user.full_name else 'U' }}
+                    </div>
+                    <h4 class="mb-0">{{ user.full_name }}</h4>
+                    <span class="badge bg-light text-primary mt-2 px-3">{{ user.role|default('User')|title }}</span>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST">
+                        <div class="row g-4">
+                            
+                            <div class="col-12"><h6 class="text-muted text-uppercase small fw-bold border-bottom pb-2">Contact Information</h6></div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                                    <input type="text" name="full_name" class="form-control" value="{{ user.full_name or '' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" value="{{ user.email or '' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Contact Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
+                                    <input type="text" name="contact_no" class="form-control" value="{{ user.contact_no or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Gender</label>
+                                <select name="gender" class="form-select">
+                                    <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-secondary">Permanent Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
+                                    <textarea name="address" class="form-control" rows="2">{{ user.address or '' }}</textarea>
+                                </div>
+                            </div>
+
+                            {% if user.role == 'student' %}
+                            <div class="col-12 mt-4">
+                                <div class="bg-light p-3 rounded border">
+                                    <h6 class="text-muted text-uppercase small fw-bold mb-3">Academic Information</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small text-secondary">Roll Number</label>
+                                            <input type="text" class="form-control bg-white" value="{{ user.roll_no or 'N/A' }}" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small text-secondary">Enrollment Date</label>
+                                            <input type="text" class="form-control bg-white" value="{{ user.enroll_date or 'N/A' }}" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small text-secondary">Current Semester</label>
+                                            <input type="text" class="form-control bg-white" value="{{ user.semester or 'N/A' }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="col-12 text-end mt-4">
+                                <button type="reset" class="btn btn-light me-2">Reset</button>
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    <i class="fas fa-save me-2"></i>Update Profile
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

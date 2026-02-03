@@ -1,0 +1,91 @@
+{% extends 'student_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Fee History</h3>
+            <p class="text-muted small mb-0">Track your payments and outstanding invoices.</p>
+        </div>
+        <div class="d-none d-sm-block">
+            <button class="btn btn-primary shadow-sm btn-sm" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Statement
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="m-0 fw-bold text-dark"><i class="fas fa-file-invoice-dollar me-2 text-warning"></i>Transaction Record</h6>
+        </div>
+
+        <div class="card-body p-0">
+            {% if fees %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Description</th>
+                            <th>Amount</th>
+                            <th class="text-end pe-4">Payment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in fees %}
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-receipt text-secondary"></i>
+                                    </div>
+                                    <span class="fw-bold text-dark">{{ f.description }}</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="fw-bold text-dark font-monospace">Rs. {{ f.amount }}</span>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                {% if f.status == 'Paid' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">
+                                        <i class="fas fa-check-circle me-1"></i> Paid
+                                    </span>
+                                {% elif f.status == 'Pending' %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-3 py-2 rounded-pill">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-3 py-2 rounded-pill">
+                                        {{ f.status }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fas fa-folder-open fa-3x text-muted opacity-25"></i>
+                </div>
+                <h6 class="fw-bold text-muted">No Records Found</h6>
+                <p class="small text-muted mb-0">You don't have any fee history recorded yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if fees %}
+        <div class="card-footer bg-light py-3 px-4 border-top">
+            <div class="d-flex align-items-center justify-content-between small text-muted">
+                <span><i class="fas fa-info-circle me-1"></i> Issues with your statement? Contact Admin.</span>
+                <span>Generated automatically</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

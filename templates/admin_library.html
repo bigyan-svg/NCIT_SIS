@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block sidebar %}
+    <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+    <li><a href="{{ url_for('manage_departments') }}"><i class="fas fa-building"></i> Depts</a></li>
+    <li><a href="{{ url_for('manage_students') }}"><i class="fas fa-user-graduate"></i> Students</a></li>
+    <li><a href="{{ url_for('manage_teachers') }}"><i class="fas fa-chalkboard-teacher"></i> Teachers</a></li>
+    <li><a href="{{ url_for('manage_courses') }}"><i class="fas fa-book"></i> Courses</a></li>
+    <li><a href="{{ url_for('assign_course') }}"><i class="fas fa-link"></i> Assign</a></li>
+    <li><a href="{{ url_for('manage_exams') }}"><i class="fas fa-clock"></i> Exams</a></li>
+    <li><a href="{{ url_for('manage_fees') }}"><i class="fas fa-money-bill"></i> Fees</a></li>
+    <li><a href="{{ url_for('manage_notices') }}"><i class="fas fa-bullhorn"></i> Notices</a></li>
+    <li><a href="{{ url_for('admin_library') }}" class="active"><i class="fas fa-book-open"></i> Library</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Library Management</h2>
+    </div>
+
+    <div id="edit-borrow-card" class="card shadow mb-4 border-primary" style="display:none;">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Borrow Record</h5>
+            <button type="button" class="btn-close btn-close-white" onclick="hideEditBorrow()"></button>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('edit_borrow') }}" method="POST">
+                <input type="hidden" name="borrow_id" id="edit_borrow_id">
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Student Name</label>
+                        <input type="text" id="edit_student_name" class="form-control bg-light" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Book Title</label>
+                        <input type="text" id="edit_book_title" class="form-control bg-light" disabled>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Due Date</label>
+                        <input type="date" name="due_date" id="edit_due_date" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Fine ($)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" name="fine" id="edit_fine" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Return Date</label>
+                        <input type="date" name="return_date" id="edit_return_date" class="form-control">
+                        <div class="form-text">Leave empty if not returned</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button type="button" class="btn btn-secondary me-2" onclick="hideEditBorrow()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Add New Category</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_category') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Computer Science" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-plus me-1"></i> Add Category
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Add New Book</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_book') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Author</label>
+                            <input type="text" name="author" class="form-control" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Category</label>
+                                <select name="category" class="form-select" required>
+                                    <option value="" selected disabled>Select...</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ISBN</label>
+                                <input type="text" name="isbn" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Copies</label>
+                            <input type="number" name="copies" class="form-control" value="1" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-book-medical me-1"></i> Add Book
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-8">
+            
+            <div class="card shadow-sm mb-4 border-0 bg-transparent">
+                <div class="card-body p-0">
+                    <form method="GET" action="{{ url_for('admin_library') }}" class="row g-2 justify-content-end">
+                        <div class="col-auto">
+                            {% if request.args.get('search_query') %}
+                                <a href="{{ url_for('admin_library') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear Search
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" name="search_query" class="form-control" 
+                                       placeholder="Search Books (Title, Author, ISBN) or Students..." 
+                                       value="{{ request.args.get('search_query', '') }}">
+                                <button class="btn btn-dark" type="submit">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Books Inventory</h5>
+                    <span class="badge bg-secondary">{{ books|length }} Titles Found</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-striped table-hover mb-0 align-middle">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Title & Author</th>
+                                    <th>Category</th>
+                                    <th>ISBN</th>
+                                    <th class="text-center">Stock</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in books %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ book.title }}</div>
+                                        <small class="text-muted">{{ book.author }}</small>
+                                    </td>
+                                    <td>{{ book.category_name }}</td>
+                                    <td><small>{{ book.isbn }}</small></td>
+                                    <td class="text-center">
+                                        <span class="badge {% if book.copies_available > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ book.copies_available }} / {{ book.copies_total }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form method="POST" onsubmit="return confirm('Delete this book permanently?');">
+                                            <input type="hidden" name="book_id" value="{{ book.book_id }}">
+                                            <button type="submit" name="delete_book" class="btn btn-sm btn-outline-danger" title="Delete Book">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No books found matching criteria.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Borrowing History</h5>
+                    <span class="badge bg-secondary">{{ borrows|length }} Records Found</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-sm table-hover mb-0 align-middle">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Book</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in borrows %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ b.student_name }}</div>
+                                        <small class="text-muted">Sem: {{ b.semester }}</small>
+                                    </td>
+                                    <td>{{ b.book_title }}</td>
+                                    <td style="font-size: 0.85rem;">
+                                        <div><span class="text-muted">Issued:</span> {{ b.borrow_date }}</div>
+                                        {% if b.return_date %}
+                                            <div><span class="text-success">Ret:</span> {{ b.return_date }}</div>
+                                        {% else %}
+                                            <div class="text-danger fw-bold">Due: {{ b.due_date }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if b.return_date %}
+                                            <span class="badge bg-secondary">Returned</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Active</span>
+                                        {% endif %}
+                                        
+                                        {% if b.fine > 0 %}
+                                            <div class="mt-1"><span class="badge bg-danger">Fine: ${{ b.fine }}</span></div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" 
+                                                onclick='showEditBorrow({{ b.borrow_id }}, "{{ b.student_name }}", "{{ b.book_title }}", "{{ b.due_date }}", "{{ b.fine }}", "{{ b.return_date or "" }}")'>
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No borrow records found matching criteria.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function showEditBorrow(id, student, book, due, fine, returned) {
+        document.getElementById('edit_borrow_id').value = id;
+        document.getElementById('edit_student_name').value = student;
+        document.getElementById('edit_book_title').value = book;
+        document.getElementById('edit_due_date').value = due;
+        document.getElementById('edit_fine').value = fine;
+        document.getElementById('edit_return_date').value = returned;
+
+        const card = document.getElementById('edit-borrow-card');
+        card.style.display = 'block';
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideEditBorrow() {
+        document.getElementById('edit-borrow-card').style.display = 'none';
+    }
+</script>
+{% endblock %}

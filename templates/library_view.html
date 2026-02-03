@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Library</h2>
+        <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-dashboard-return">
+            &larr; Return Dashboard
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Available Books (Borrow)</h5>
+                </div>
+
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>ISBN</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.author }}</td>
+                                <td>{{ book.category_name }}</td>
+                                <td>{{ book.isbn }}</td>
+                                <td>
+                                    {% if book.copies_available > 0 %}
+                                        <a href="{{ url_for('student_borrow_book', book_id=book.book_id) }}"
+                                           class="btn btn-sm btn-borrow"
+                                           onclick="return confirm('Borrow {{ book.title }}?')">
+                                           Borrow
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Out of Stock</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No books available in the library.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">My Borrows</h5>
+                </div>
+
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Title</th>
+                                <th>Borrowed</th>
+                                <th>Due</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in my_borrows %}
+                            <tr>
+                                <td>{{ borrow.book_title }}</td>
+                                <td>{{ borrow.borrow_date }}</td>
+                                <td>{{ borrow.due_date }}</td>
+                                <td>
+                                    {% if borrow.is_overdue %}
+                                        <span class="badge bg-danger">Overdue (Fine: {{ borrow.fine }})</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('student_return_book', borrow_id=borrow.borrow_id) }}"
+                                       class="btn btn-sm btn-return"
+                                       onclick="return confirm('Return {{ borrow.book_title }}?')">
+                                       Return
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">You haven't borrowed any books.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

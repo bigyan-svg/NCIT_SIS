@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCIT SIS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f8f9fa;
+        }
+        
+        /* Layout Variables */
+        :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #2c3e50; /* Dark Blue-Grey */
+            color: #fff;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar .brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: #243342;
+        }
+
+        .sidebar ul.menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar ul.menu li a {
+            display: block;
+            padding: 12px 25px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar ul.menu li a:hover, 
+        .sidebar ul.menu li a.active {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-left-color: #3498db;
+        }
+        
+        .sidebar ul.menu li a i {
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .sidebar .logout {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: #243342;
+        }
+        
+        .sidebar .logout a {
+            color: #e74c3c;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+        }
+
+        /* Main Content Area */
+        .content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .content .header {
+            height: var(--header-height);
+            background: #fff;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            .sidebar.active {
+                margin-left: 0;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            }
+            .content {
+                margin-left: 0;
+            }
+            /* Dark overlay when sidebar is open on mobile */
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0;
+                width: 100vw; height: 100vh;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fas fa-university me-2 text-info"></i> NCIT SIS
+        </div>
+        
+        <ul class="menu">
+            {% block sidebar %}{% endblock %}
+        </ul>
+        
+        <div class="logout">
+            <a href="{{ url_for('logout') }}" onclick="return confirm('Are you sure you want to logout?');">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="content">
+        
+        <div class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link text-dark d-md-none me-3 p-0" id="sidebarToggle" style="font-size: 1.5rem;">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="mb-0 fw-bold text-secondary">{{ session.get('role', 'User').title() }} Portal</h5>
+            </div>
+
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 38px; height: 38px; font-weight: 600;">
+                        {{ session.get('name', 'U')[0].upper() }}
+                    </div>
+                    <div class="d-none d-sm-block text-start" style="line-height: 1.2;">
+                        <span class="d-block fw-semibold" style="font-size: 0.9rem;">{{ session.get('name', 'Guest') }}</span>
+                        <small class="text-muted" style="font-size: 0.75rem;">{{ session.get('role', 'User').title() }}</small>
+                    </div>
+                </a>
+                
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userDropdown">
+                    
+                    <li>
+                        <a class="dropdown-item py-2" href="{{ url_for('profile') }}">
+                            <i class="fas fa-user-circle me-2 text-primary"></i> My Profile
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a class="dropdown-item py-2" href="{{ url_for('settings') }}">
+                            <i class="fas fa-cog me-2 text-secondary"></i> Settings
+                        </a>
+                    </li>
+                    
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    <li>
+                        <a class="dropdown-item py-2 text-danger" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container-fluid pt-4 px-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        if(toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+        if(overlay) overlay.addEventListener('click', toggleSidebar);
+    </script>
+
+</body>
+</html>

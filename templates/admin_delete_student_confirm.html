@@ -1,0 +1,44 @@
+{% extends 'admin_dash.html' %}
+{% block content %}
+
+<div class="header">
+    <h3>Confirm Force Delete Student</h3>
+    <a href="{{ url_for('manage_students') }}" class="badge bg-dark">Back to Students</a>
+</div>
+
+<div class="card">
+    <div style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 8px; margin-bottom: 20px;">
+        <p><strong>Warning: This action is irreversible and will permanently delete the student and ALL related data!</strong></p>
+        
+        <ul style="margin: 15px 0;">
+            <li><strong>Student:</strong> {{ student.full_name }} ({{ student.email }})</li>
+            <li><strong>Department:</strong> {{ student.dept_name or 'N/A' }}</li>
+            <li><strong>Semester:</strong> {{ student.semester or 'N/A' }}</li>
+        </ul>
+
+        {% if total_related > 0 %}
+        <p><strong>Related records that will also be deleted ({{ total_related }} total):</strong></p>
+        <ul>
+            <li>Borrowed books: {{ counts.borrows }}</li>
+            <li>Fee records: {{ counts.fees }}</li>
+            <li>Exam results: {{ counts.results }}</li>
+            <li>Attendance records: {{ counts.attendance }}</li>
+            <li>Course enrollments: {{ counts.enrollments }}</li>
+        </ul>
+        {% else %}
+        <p>No related records found.</p>
+        {% endif %}
+    </div>
+
+    <form method="POST">
+        <button type="submit" style="background: #dc3545; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 1.1em;">
+            Confirm: Delete Student & All Related Data
+        </button>
+        <a href="{{ url_for('manage_students') }}" 
+           style="margin-left: 15px; padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 6px;">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

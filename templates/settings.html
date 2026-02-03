@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Local Styles for Settings Page */
+    .settings-card {
+        border-radius: 20px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        animation: slideUp 0.5s ease-out;
+    }
+
+    .settings-header {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        padding: 30px;
+        color: white;
+        text-align: center;
+        position: relative;
+    }
+    
+    /* Decorative circle in header */
+    .header-circle {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        top: -50px;
+        right: -50px;
+    }
+
+    .form-floating > .form-control {
+        border-radius: 10px;
+        border: 1px solid #e3e6f0;
+    }
+    .form-floating > .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+    }
+
+    .btn-update {
+        background: #4e73df;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-update:hover {
+        background: #2e59d9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+    }
+
+    .btn-return {
+        background: #f8f9fc;
+        color: #858796;
+        border: 1px solid #e3e6f0;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .btn-return:hover {
+        background: #eaecf4;
+        color: #5a5c69;
+        text-decoration: none;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6 col-lg-5">
+            
+            <div class="card settings-card">
+                
+                <div class="settings-header">
+                    <div class="header-circle"></div>
+                    <i class="fas fa-user-cog fa-3x mb-3 opacity-75"></i>
+                    <h4 class="mb-0 fw-bold">Account Settings</h4>
+                    <p class="mb-0 opacity-75 small">Manage your password and security</p>
+                </div>
+
+                <div class="card-body p-5">
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" name="current_password" class="form-control" id="currentInfo" placeholder="Current Password" required>
+                            <label for="currentInfo">Current Password</label>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" name="new_password" class="form-control" id="newInfo" placeholder="New Password" required>
+                            <label for="newInfo">New Password</label>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input type="password" name="confirm_password" class="form-control" id="confirmInfo" placeholder="Confirm New Password" required>
+                            <label for="confirmInfo">Confirm New Password</label>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-update text-white">
+                                <i class="fas fa-save me-2"></i>Update Password
+                            </button>
+                            
+                            <a href="javascript:history.back()" class="btn btn-return text-center">
+                                <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'student_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Attendance Report</h3>
+            <p class="text-muted small mb-0">Track your class participation and eligibility.</p>
+        </div>
+        <div class="bg-white px-3 py-2 rounded shadow-sm border">
+            <small class="fw-bold text-muted">Minimum Requirement: <span class="text-success">75%</span></small>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="m-0 fw-bold text-primary"><i class="fas fa-clipboard-check me-2"></i>Subject-wise Breakdown</h6>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 35%;">Course Name</th>
+                            <th class="text-center" style="width: 15%;">Total Classes</th>
+                            <th class="text-center" style="width: 15%;">Attended</th>
+                            <th class="pe-4" style="width: 35%;">Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                        {% set pct = (r[2]/r[1]*100)|round(1) %}
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-book text-primary opacity-75"></i>
+                                    </div>
+                                    <span class="fw-bold text-dark">{{ r[0] }}</span>
+                                </div>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border px-3">{{ r[1] }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="fw-bold text-dark">{{ r[2] }}</span>
+                            </td>
+
+                            <td class="pe-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-3" style="height: 8px; border-radius: 10px; background-color: #eaecf4;">
+                                        <div class="progress-bar {{ 'bg-success' if pct > 75 else 'bg-danger' }}" 
+                                             role="progressbar" 
+                                             style="width: {{ pct }}%; border-radius: 10px;">
+                                        </div>
+                                    </div>
+                                    <span class="fw-bold small {{ 'text-success' if pct > 75 else 'text-danger' }}" style="min-width: 45px;">
+                                        {{ pct }}%
+                                    </span>
+                                </div>
+                                <div class="small mt-1 text-end text-muted" style="font-size: 0.75rem;">
+                                    {% if pct > 75 %}
+                                        <i class="fas fa-check-circle text-success me-1"></i>Eligible
+                                    {% else %}
+                                        <i class="fas fa-exclamation-triangle text-danger me-1"></i>Low Attendance
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fas fa-calendar-times fa-3x mb-3 opacity-25"></i><br>
+                                No attendance records found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
