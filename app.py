@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 import mysql.connector
 from datetime import date, datetime, timedelta
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "ncit_secure_secret_key_2024"
+app.secret_key = os.getenv("SECRET_KEY", "dev_secret_key")
 
 # ==========================================
 # DATABASE CONNECTION
@@ -12,16 +16,32 @@ app.secret_key = "ncit_secure_secret_key_2024"
 
 def get_db():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",  # <--- ENTER YOUR MYSQL PASSWORD HERE
-        database="ncit_sis",
-        port=3306
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD", ""),
+        database=os.getenv("DB_NAME", "ncit_sis"),
+        port=int(os.getenv("DB_PORT", "3306"))
     )
 
 # ==========================================
 # HELPER FUNCTIONS
 # ==========================================
+
+def is_password_hashed(value):
+    if not value:
+        return False
+    return (
+        value.startswith("pbkdf2:")
+        or value.startswith("scrypt:")
+        or value.startswith("argon2:")
+    )
+
+def verify_password(stored, provided):
+    if not stored:
+        return False
+    if is_password_hashed(stored):
+        return check_password_hash(stored, provided)
+    return stored == provided
 
 def check_auth(role_required):
     if 'user_id' not in session: return False
@@ -69,17 +89,22 @@ def login():
         password = request.form['password']
         
         conn = get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT user_id, full_name, role FROM users WHERE email=%s AND password=%s", (email, password))
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT user_id, full_name, role, password FROM users WHERE email=%s", (email,))
         user = cur.fetchone()
-        conn.close()
         
-        if user:
-            session['user_id'] = user[0]
-            session['name'] = user[1]
-            session['role'] = user[2]
-            return redirect(url_for(f"{user[2]}_dashboard"))
+        if user and verify_password(user['password'], password):
+            if not is_password_hashed(user['password']):
+                new_hash = generate_password_hash(password)
+                cur.execute("UPDATE users SET password=%s WHERE user_id=%s", (new_hash, user['user_id']))
+                conn.commit()
+            session['user_id'] = user['user_id']
+            session['name'] = user['full_name']
+            session['role'] = user['role']
+            conn.close()
+            return redirect(url_for(f"{user['role']}_dashboard"))
         else:
+            conn.close()
             flash("Invalid Credentials! Please try again.")
             
     return render_template('login.html')
@@ -153,11 +178,12 @@ def settings():
         cur.execute("SELECT password FROM users WHERE user_id = %s", (session['user_id'],))
         stored = cur.fetchone()
 
-        if stored and stored['password'] == current_pass:
+        if stored and verify_password(stored['password'], current_pass):
             if new_pass == confirm_pass and new_pass.strip() != '':
                 try:
+                    new_hash = generate_password_hash(new_pass)
                     cur.execute("UPDATE users SET password = %s WHERE user_id = %s",
-                                (new_pass, session['user_id']))
+                                (new_hash, session['user_id']))
                     conn.commit()
                     flash('Password changed successfully!', 'success')
                 except mysql.connector.Error as e:
@@ -466,6 +492,7 @@ def manage_students():
             gender = request.form['gender']
             address = request.form['address'].strip()
             enroll_date = request.form['enroll_date']
+            password_hash = generate_password_hash(request.form['password'])
             
             cur.execute("""INSERT INTO users 
                            (roll_no, full_name, email, password, role, dept_id, semester, 
@@ -474,7 +501,7 @@ def manage_students():
                         (roll_no,
                          request.form['full_name'].strip(),
                          request.form['email'].strip(),
-                         request.form['password'],
+                         password_hash,
                          request.form['dept_id'],
                          request.form['semester'],
                          enroll_date if enroll_date else date.today(),
@@ -659,6 +686,7 @@ def manage_teachers():
             contact_no = request.form['contact_no'].strip()
             gender = request.form['gender']
             address = request.form['address'].strip()
+            password_hash = generate_password_hash(request.form['password'])
             
             cur.execute("""INSERT INTO users 
                            (full_name, email, password, role, dept_id, 
@@ -666,7 +694,7 @@ def manage_teachers():
                            VALUES (%s, %s, %s, 'teacher', %s, %s, %s, %s)""",
                         (request.form['full_name'].strip(),
                          request.form['email'].strip(),
-                         request.form['password'],
+                         password_hash,
                          request.form['dept_id'],
                          contact_no,
                          gender,

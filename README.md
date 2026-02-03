@@ -49,11 +49,14 @@ Screenshots live in `docs/screenshots/`.
 - Python 3
 - Flask + Jinja2 templates
 - MySQL (mysql-connector-python)
+- python-dotenv
 - HTML/CSS in `templates/` and `static/`
 
 ## Project layout
 
 - `app.py` - main application entry point
+- `schema.sql` - MySQL schema dump
+- `scripts/` - seed and maintenance scripts
 - `templates/` - HTML templates
 - `static/` - static assets
 
@@ -81,13 +84,26 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Configure MySQL connection values in `app.py`.
-4. Create the database and tables (see Database section).
+3. Create your environment file:
 
-## Configuration
+```bash
+# Windows
+copy .env.example .env
+# macOS/Linux
+cp .env.example .env
+```
 
-- `app.secret_key` in `app.py`
-- MySQL connection in `get_db()` inside `app.py`
+4. Update values in `.env` (secret key and DB credentials).
+5. Create the database and tables (see Database section).
+
+## Environment
+
+- `SECRET_KEY` - Flask secret key
+- `DB_HOST` - MySQL host
+- `DB_USER` - MySQL username
+- `DB_PASSWORD` - MySQL password
+- `DB_NAME` - database name
+- `DB_PORT` - MySQL port
 
 ## Database
 
@@ -125,7 +141,19 @@ mysql -u root -p ncit_sis < schema.sql
 
 Seed at least one admin user, departments, and courses so dashboards have data.
 
-Note: current login compares plaintext passwords in the `users` table. If you switch to hashed passwords, update the login logic accordingly.
+Password security:
+
+- New users are stored with hashed passwords.
+- Existing plaintext passwords can still log in and will be upgraded on successful login.
+- You can also hash all existing passwords at once with `python scripts/upgrade_passwords.py`.
+
+## Seed data
+
+Create an admin user:
+
+```bash
+python scripts/seed_admin.py
+```
 
 ## Run
 
