@@ -90,6 +90,16 @@ Minimum schema expected by the app (key columns):
 - `library_books`: `book_id`, `title`, `author`, `category_id`, `isbn`, `copies_total`
 - `borrows`: `borrow_id`, `book_id`, `student_id`, `borrow_date`, `due_date`, `return_date`, `fine`
 
+Schema file:
+
+- `schema.sql` includes a full MySQL dump you can import.
+
+Import example:
+
+```bash
+mysql -u root -p ncit_sis < schema.sql
+```
+
 Seed at least one admin user, departments, and courses so dashboards have data.
 
 Note: current login compares plaintext passwords in the `users` table. If you switch to hashed passwords, update the login logic accordingly.
