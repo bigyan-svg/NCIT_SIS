@@ -17,12 +17,32 @@ NCIT_SIS is a Flask + MySQL student information system with role-based access fo
 
 Screenshots live in `docs/screenshots/`.
 
-| Screenshot | Description |
-| --- | --- |
-| ![Login](docs/screenshots/login.png) | Login page for user authentication. |
-| ![Admin Dashboard](docs/screenshots/admin-dashboard.png) | Admin overview with totals, notices, and quick stats. |
-| ![Student Dashboard](docs/screenshots/student-dashboard.png) | Student view of courses, results, fees, and notices. |
-| ![Teacher Dashboard](docs/screenshots/teacher-dashboard.png) | Teacher view with assigned classes and notices. |
+<table>
+  <tr>
+    <td align="center">
+      <img src="docs/screenshots/login.png" width="420" alt="Login">
+      <br>
+      <sub><b>Login</b> - User authentication screen.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/screenshots/admin-dashboard.png" width="420" alt="Admin Dashboard">
+      <br>
+      <sub><b>Admin Dashboard</b> - Overview of totals, notices, and quick stats.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="docs/screenshots/student-dashboard.png" width="420" alt="Student Dashboard">
+      <br>
+      <sub><b>Student Dashboard</b> - Courses, results, fees, and notices at a glance.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/screenshots/teacher-dashboard.png" width="420" alt="Teacher Dashboard">
+      <br>
+      <sub><b>Teacher Dashboard</b> - Assigned classes and recent notices.</sub>
+    </td>
+  </tr>
+</table>
 
 ## Tech stack
 
