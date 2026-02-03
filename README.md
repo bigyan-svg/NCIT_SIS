@@ -17,21 +17,12 @@ NCIT_SIS is a Flask + MySQL student information system with role-based access fo
 
 Screenshots live in `docs/screenshots/`.
 
-Login page - user authentication screen.
-
-![Login](docs/screenshots/login.png)
-
-Admin dashboard - overview of totals, notices, and quick stats.
-
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-Student dashboard - courses, results, fees, and notices at a glance.
-
-![Student Dashboard](docs/screenshots/student-dashboard.png)
-
-Teacher dashboard - assigned classes and notices.
-
-![Teacher Dashboard](docs/screenshots/teacher-dashboard.png)
+| Screenshot | Description |
+| --- | --- |
+| ![Login](docs/screenshots/login.png) | Login page for user authentication. |
+| ![Admin Dashboard](docs/screenshots/admin-dashboard.png) | Admin overview with totals, notices, and quick stats. |
+| ![Student Dashboard](docs/screenshots/student-dashboard.png) | Student view of courses, results, fees, and notices. |
+| ![Teacher Dashboard](docs/screenshots/teacher-dashboard.png) | Teacher view with assigned classes and notices. |
 
 ## Tech stack
 
