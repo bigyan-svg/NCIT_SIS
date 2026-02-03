@@ -27,17 +27,13 @@
         overflow: hidden;
         position: relative;
         transition: transform var(--transition-speed), box-shadow var(--transition-speed);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        box-shadow: var(--shadow-sm);
         min-height: 140px;
     }
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        box-shadow: var(--shadow-md);
     }
-
-    .bg-gradient-blue   { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
-    .bg-gradient-green  { background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); }
-    .bg-gradient-red    { background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%); }
 
     .stat-card .card-body {
         position: relative;
@@ -61,37 +57,44 @@
     .notice-item {
         border-left: 4px solid transparent;
         transition: all 0.2s;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--line);
         padding: 1.25rem;
     }
     .notice-item:last-child { border-bottom: none; }
     .notice-item:hover {
-        background-color: #f8f9fc;
-        border-left-color: #4e73df;
+        background-color: var(--bg-1);
+        border-left-color: var(--accent);
     }
 
     /* Quick Action Buttons */
     .btn-action-card {
-        border: 1px solid #eaecf4;
+        border: 1px solid var(--line);
         border-radius: 12px;
         padding: 15px;
         display: flex;
         align-items: center;
-        background: white;
+        background: var(--card-solid);
         transition: 0.3s;
         text-decoration: none;
-        color: #5a5c69;
+        color: var(--muted);
         margin-bottom: 10px;
+        box-shadow: var(--shadow-sm);
     }
     .btn-action-card:hover {
-        border-color: #4e73df;
-        background: #f8f9fc;
+        border-color: transparent;
+        background: var(--gradient-primary);
         transform: translateX(5px);
-        color: #4e73df;
+        color: #fff;
     }
     .btn-action-card i {
         font-size: 1.2rem;
         width: 40px;
+    }
+
+    .btn-action-card:hover i,
+    .btn-action-card:hover .text-dark,
+    .btn-action-card:hover .text-muted {
+        color: #fff !important;
     }
 </style>
 
