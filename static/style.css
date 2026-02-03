@@ -1,60 +1,116 @@
 /* =========================================
-   1. VARIABLES & RESET
+   NCIT_SIS - Modern Visual Theme
    ========================================= */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap");
+
 :root {
-    --primary: #2c3e50;
-    --secondary: #34495e;
-    --accent: #3498db;
-    --success: #27ae60;
-    --danger: #c0392b;
-    --warning: #f39c12;
-    --light: #ecf0f1;
-    --dark: #2c3e50;
+    --bg-0: #f8fafc;
+    --bg-1: #f1f5f9;
+    --ink: #0f172a;
+    --ink-2: #1f2937;
+    --muted: #64748b;
+    --card: rgba(255, 255, 255, 0.82);
+    --card-solid: #ffffff;
+    --line: rgba(15, 23, 42, 0.08);
+    --accent: #0ea5a3;
+    --accent-2: #14b8a6;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
     --sidebar-w: 260px;
-    --border-color: #e0e0e0;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.12);
+    --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.16);
+    --glow: 0 0 0 6px rgba(14, 165, 163, 0.12);
+    --transition: 180ms ease;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
     margin: 0;
-    background: #f4f7f6;
-    display: flex;
     min-height: 100vh;
-    color: #333;
+    display: flex;
+    font-family: "Space Grotesk", sans-serif;
+    color: var(--ink);
+    line-height: 1.6;
+    background-image:
+        radial-gradient(1200px 600px at 10% -10%, rgba(14, 165, 163, 0.20), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(245, 158, 11, 0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 100%);
+    background-attachment: fixed;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+    background-image:
+        linear-gradient(transparent 0 31px, rgba(15, 23, 42, 0.03) 32px),
+        linear-gradient(90deg, transparent 0 31px, rgba(15, 23, 42, 0.03) 32px);
+    background-size: 32px 32px;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: inherit;
+}
+
+h1, h2, h3, h4 {
+    font-family: "Fraunces", serif;
+    color: var(--ink);
+    letter-spacing: 0.2px;
+    margin: 0 0 0.6rem 0;
 }
 
 /* =========================================
-   2. LAYOUT: SIDEBAR & MAIN CONTENT
+   LAYOUT: SIDEBAR & MAIN CONTENT
    ========================================= */
-
-/* Sidebar */
 .sidebar {
     width: var(--sidebar-w);
-    background: var(--primary);
-    color: #fff;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 60%, #0b1220 100%);
+    color: #e2e8f0;
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    z-index: 100;
+    box-shadow: 2px 0 20px rgba(2, 6, 23, 0.25);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 2;
 }
 
 .brand {
-    padding: 25px;
+    padding: 24px 22px;
     font-size: 1.4rem;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
-    background: rgba(0,0,0,0.1);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    letter-spacing: 0.6px;
 }
 
 .menu {
     list-style: none;
     padding: 0;
-    margin: 20px 0;
+    margin: 18px 0;
     flex-grow: 1;
     overflow-y: auto;
 }
@@ -62,30 +118,71 @@ body {
 .menu li a {
     display: flex;
     align-items: center;
-    padding: 15px 25px;
-    color: #bdc3c7;
+    gap: 10px;
+    padding: 12px 16px;
+    margin: 6px 12px;
+    border-radius: 10px;
+    color: #cbd5f5;
     text-decoration: none;
-    transition: 0.3s;
-    border-left: 4px solid transparent;
+    transition: var(--transition);
+    position: relative;
+    border: 1px solid transparent;
 }
 
-.menu li a:hover, .menu li a.active {
-    background: var(--secondary);
-    color: #fff;
-    border-left-color: var(--accent);
+.menu li a::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--accent);
+    opacity: 0;
+    transform: scaleY(0.6);
+    transition: var(--transition);
 }
 
-.menu i { width: 25px; margin-right: 10px; text-align: center; }
+.menu li a:hover,
+.menu li a.active {
+    background: rgba(14, 165, 163, 0.18);
+    color: #ffffff;
+    border-color: rgba(14, 165, 163, 0.35);
+}
 
-.logout { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-.logout a { color: var(--danger) !important; font-weight: bold; display: flex; align-items: center; text-decoration: none; }
-.logout a i { margin-right: 10px; }
+.menu li a:hover::before,
+.menu li a.active::before {
+    opacity: 1;
+    transform: scaleY(1);
+}
+
+.menu i {
+    width: 22px;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.logout {
+    padding: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logout a {
+    color: #fca5a5 !important;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
 
 /* Main Content Area */
 .content {
     margin-left: var(--sidebar-w);
     width: calc(100% - var(--sidebar-w));
-    padding: 30px;
+    padding: 32px 36px 60px;
+    position: relative;
+    z-index: 1;
 }
 
 /* Header & Cards */
@@ -93,124 +190,112 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    gap: 18px;
+    margin-bottom: 26px;
+    background: var(--card);
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(12px);
 }
 
 .card {
-    background: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
+    background: var(--card);
+    padding: 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 /* =========================================
-   3. COMPONENTS: ALERTS & UTILITIES (Updated)
+   FORMS & BUTTONS
    ========================================= */
-/* ... keep your alert and badge styles ... */
-
-/* Color Utilities - forces white text on colored backgrounds */
-.bg-blue { background: var(--accent); color: #fff; }
-.bg-green { background: var(--success); color: #fff; } /* Added bg-green alias */
-.bg-orange { background: var(--warning); color: #fff; } /* Added bg-orange alias */
-.bg-red { background: var(--danger); color: #fff; }
-.bg-dark { background: var(--secondary); color: #fff; }
-
-/* Also keep the semantic names if you use them */
-.bg-success { background: var(--success); color: #fff; }
-.bg-warning { background: var(--warning); color: #fff; }
-.bg-danger { background: var(--danger); color: #fff; }
-
-
-/* =========================================
-   6. DASHBOARD WIDGETS (Updated)
-   ========================================= */
-.stats-grid {
+form {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 14px;
 }
-
-.stat-box {
-    padding: 25px;
-    border-radius: 8px;
-    background: #fff; /* Default background is white */
-    color: var(--primary); /* Default text is DARK so it is visible */
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-}
-
-.stat-box:hover {
-    transform: translateY(-5px);
-}
-
-/* Ensure headings inside colored boxes inherit the white text */
-.bg-blue h3, .bg-green h3, .bg-orange h3, .bg-red h3,
-.bg-success h3, .bg-warning h3, .bg-danger h3 {
-    color: #fff;
-}
-/* =========================================
-   4. FORMS & BUTTONS
-   ========================================= */
-form { display: grid; gap: 15px; }
 
 input, select, textarea {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    padding: 12px 14px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
     width: 100%;
     box-sizing: border-box;
     font-family: inherit;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--ink);
+    transition: var(--transition);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
+    box-shadow: var(--glow);
 }
 
-/* Base Button */
 button {
     padding: 12px 20px;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
-    transition: 0.2s;
+    transition: var(--transition);
+    box-shadow: 0 12px 24px rgba(14, 165, 163, 0.25);
 }
-button:hover { opacity: 0.9; }
 
-/* Action Buttons (Link styled as button) */
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Action Buttons */
 .btn-edit, .btn-delete, .btn-add {
     display: inline-block;
-    padding: 8px 15px;
-    border-radius: 5px;
+    padding: 8px 16px;
+    border-radius: 10px;
     text-decoration: none;
     font-size: 0.9rem;
     cursor: pointer;
     border: none;
-    color: white;
+    color: #fff;
+    transition: var(--transition);
 }
 
 .btn-add {
-    background-color: #2c3e50;
-    padding: 10px 20px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #0f172a, #1f2937);
+    padding: 10px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
 }
 
-.btn-edit { background-color: #3498db; margin-right: 5px; }
-.btn-delete { background-color: #e74c3c; }
+.btn-edit {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    margin-right: 6px;
+}
 
-
-/* =========================================
-   4.1 SPECIFIC STUDENT LIBRARY BUTTONS (UPDATED)
-   ========================================= */
+.btn-delete {
+    background: linear-gradient(135deg, #fb7185, #ef4444);
+}
 
 /* Return Dashboard Button */
 .btn-dashboard-return {
@@ -219,9 +304,9 @@ button:hover { opacity: 0.9; }
     border: 2px solid var(--accent);
     padding: 8px 16px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 999px;
 }
 
 .btn-dashboard-return:hover {
@@ -230,89 +315,107 @@ button:hover { opacity: 0.9; }
     text-decoration: none;
 }
 
-/* Borrow Book Button (Table) */
+/* Borrow Book Button */
 .btn-borrow {
     background-color: var(--success);
-    color: white !important; /* Ensure text stays white */
+    color: #fff !important;
     border: none;
     padding: 6px 14px;
-    border-radius: 5px;
+    border-radius: 999px;
     font-size: 0.9rem;
-    transition: background-color 0.2s;
+    transition: var(--transition);
     text-decoration: none;
     display: inline-block;
 }
 
 .btn-borrow:hover {
-    background-color: #219150; /* Darker green */
+    filter: brightness(0.96);
 }
 
-/* Return Book Button (Table) */
+/* Return Book Button */
 .btn-return {
-    background-color: var(--warning); /* Orange for return */
-    color: white !important;
+    background-color: var(--warning);
+    color: #fff !important;
     border: none;
     padding: 6px 14px;
-    border-radius: 5px;
+    border-radius: 999px;
     font-size: 0.9rem;
-    transition: background-color 0.2s;
+    transition: var(--transition);
     text-decoration: none;
     display: inline-block;
 }
 
 .btn-return:hover {
-    background-color: #d35400; /* Darker orange */
+    filter: brightness(0.95);
 }
 
-
 /* =========================================
-   5. TABLES (GENERIC & SPECIFIC)
+   TABLES
    ========================================= */
-
-/* Generic Table */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 10px;
     margin-top: 15px;
 }
 
-th, td {
-    padding: 15px;
+thead th {
     text-align: left;
-    border-bottom: 1px solid #eee;
+    padding: 10px 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.74rem;
+    color: var(--muted);
 }
 
-th {
-    background: #f8f9fa;
-    color: var(--dark);
-    font-weight: 600;
+tbody tr {
+    background: var(--card-solid);
+    box-shadow: var(--shadow-sm);
 }
 
-tr:hover { background: #fafafa; }
+tbody td {
+    padding: 14px;
+    border-top: 1px solid rgba(15, 23, 42, 0.04);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+tbody td:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+tbody td:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+tbody tr:hover {
+    transform: translateY(-1px);
+    transition: var(--transition);
+}
 
 /* --- Admin Library Table --- */
 .library-table {
     width: 100%;
-    border-collapse: separate; 
+    border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-top: 0;
+    box-shadow: var(--shadow-sm);
 }
 
 .library-table thead th {
-    background-color: #34495e;
-    color: white;
-    padding: 15px;
-    text-align: left;
-    font-weight: 600;
-    border-bottom: none;
+    background: linear-gradient(135deg, #0f172a, #1f2937);
+    color: #fff;
+    padding: 14px 16px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.9rem;
 }
 
 .library-table td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
+    padding: 14px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
     vertical-align: middle;
 }
 
@@ -321,62 +424,75 @@ tr:hover { background: #fafafa; }
 }
 
 /* =========================================
-   6. DASHBOARD WIDGETS (FIXED)
+   DASHBOARD WIDGETS
    ========================================= */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 18px;
 }
 
-/* Default Box Style (White Background, Dark Text) */
 .stat-box {
-    padding: 25px;
-    border-radius: 8px;
-    background: #fff;         /* Default to White */
-    color: var(--primary);    /* Default to Dark Text */
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    padding: 22px;
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--ink);
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-box::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -30px;
+    width: 120px;
+    height: 120px;
+    background: rgba(14, 165, 163, 0.15);
+    border-radius: 50%;
 }
 
 .stat-box:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
-/* Specific Overrides - These will definitely show the colors now */
 .stat-box.bg-blue {
-    background-color: var(--accent) !important;
-    color: #fff !important;
+    background: linear-gradient(135deg, #0ea5a3, #14b8a6);
+    color: #fff;
 }
 
 .stat-box.bg-green {
-    background-color: var(--success) !important;
-    color: #fff !important;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
 }
 
 .stat-box.bg-orange {
-    background-color: var(--warning) !important;
-    color: #fff !important;
-}
-
-.stat-box.bg-red, .stat-box.bg-danger {
-    background-color: var(--danger) !important;
-    color: #fff !important;
-}
-
-/* Ensure the headers inside colored boxes are also white */
-.stat-box.bg-blue h3, 
-.stat-box.bg-green h3, 
-.stat-box.bg-orange h3, 
-.stat-box.bg-red h3 {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
     color: #fff;
 }
-/* =========================================
-   7. LIBRARY SPECIFIC MODULES (STUDENT & ADMIN)
-   ========================================= */
 
-/* Split Layout for Student View (Grid Left, Table Right) */
+.stat-box.bg-red,
+.stat-box.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: #fff;
+}
+
+.stat-box.bg-blue h3,
+.stat-box.bg-green h3,
+.stat-box.bg-orange h3,
+.stat-box.bg-red h3,
+.stat-box.bg-danger h3 {
+    color: #fff;
+}
+
+/* =========================================
+   LIBRARY SPECIFIC MODULES
+   ========================================= */
 .library-split-container {
     display: flex;
     gap: 30px;
@@ -384,16 +500,15 @@ tr:hover { background: #fafafa; }
 }
 
 .library-book-section {
-    flex: 2; /* Takes 66% width */
+    flex: 2;
 }
 
 .library-history-section {
-    flex: 1; /* Takes 33% width */
+    flex: 1;
     position: sticky;
-    top: 30px; /* Sticks when scrolling */
+    top: 30px;
 }
 
-/* Responsive: Stack columns on smaller screens */
 @media (max-width: 1100px) {
     .library-split-container {
         flex-direction: column;
@@ -405,75 +520,83 @@ tr:hover { background: #fafafa; }
     }
 }
 
-/* Student Library Grid */
 .library-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+    gap: 18px;
     padding: 10px 0;
 }
 
 .book-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    background: var(--card-solid);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     padding: 20px;
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #eee;
+    transition: var(--transition);
+    border: 1px solid var(--line);
     position: relative;
     overflow: hidden;
 }
 
-.book-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* Top accent bar on card */
 .book-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 4px;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .book-icon {
-    font-size: 36px;
-    color: var(--secondary);
-    margin-bottom: 15px;
+    font-size: 34px;
+    color: var(--ink-2);
+    margin-bottom: 12px;
     text-align: center;
 }
 
 .book-title {
-    font-size: 1.1rem;
+    font-size: 1.08rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--ink);
     margin-bottom: 8px;
     line-height: 1.3;
 }
 
 .book-detail {
-    color: #666;
-    font-size: 0.9rem;
+    color: var(--muted);
+    font-size: 0.92rem;
     margin-bottom: 4px;
 }
 
 .book-detail i {
     margin-right: 8px;
-    color: #95a5a6;
+    color: #94a3b8;
     width: 16px;
     text-align: center;
 }
 
-/* Availability Text Styles */
-.status-text { font-weight: bold; font-size: 0.85rem; margin-top: 10px; display: block; }
-.text-success { color: #27ae60; }
-.text-danger { color: #c0392b; }
+.status-text {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    display: block;
+}
+
+.text-success {
+    color: #16a34a;
+}
+
+.text-danger {
+    color: #dc2626;
+}
 
 .book-footer {
     margin-top: auto;
@@ -481,27 +604,124 @@ tr:hover { background: #fafafa; }
     text-align: center;
 }
 
-/* Compact Table for "My Borrows" Sidebar */
 .compact-table {
     font-size: 0.9rem;
 }
-.compact-table th, .compact-table td {
+
+.compact-table th,
+.compact-table td {
     padding: 10px;
 }
 
-/* Overdue Styling */
 .row-overdue {
     background-color: #fff5f5;
 }
+
 .row-overdue td {
-    color: #c0392b;
+    color: #b91c1c;
 }
+
 .fine-badge {
-    background: #c0392b;
-    color: white;
+    background: #dc2626;
+    color: #fff;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 0.75rem;
     margin-left: 5px;
 }
 
+/* =========================================
+   UTILITIES
+   ========================================= */
+.bg-blue { background: var(--accent); color: #fff; }
+.bg-green { background: var(--success); color: #fff; }
+.bg-orange { background: var(--warning); color: #fff; }
+.bg-red { background: var(--danger); color: #fff; }
+.bg-dark { background: #111827; color: #fff; }
+
+.bg-success { background: var(--success); color: #fff; }
+.bg-warning { background: var(--warning); color: #fff; }
+.bg-danger { background: var(--danger); color: #fff; }
+
+/* =========================================
+   MOTION
+   ========================================= */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header,
+.card,
+.stat-box,
+.library-table,
+.book-card {
+    animation: fadeUp 0.45s ease both;
+}
+
+.stats-grid .stat-box:nth-child(2),
+.content > .card:nth-child(2) {
+    animation-delay: 0.06s;
+}
+
+.stats-grid .stat-box:nth-child(3),
+.content > .card:nth-child(3) {
+    animation-delay: 0.12s;
+}
+
+.stats-grid .stat-box:nth-child(4),
+.content > .card:nth-child(4) {
+    animation-delay: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 980px) {
+    body {
+        display: block;
+    }
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+    }
+    .menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .content {
+        margin-left: 0;
+        width: 100%;
+        padding: 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .menu {
+        grid-template-columns: 1fr;
+    }
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
