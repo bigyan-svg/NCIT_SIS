@@ -20,6 +20,7 @@ Add screenshots under `docs/screenshots/` and update the links below.
 ![Login](docs/screenshots/login.png)
 ![Admin Dashboard](docs/screenshots/admin-dashboard.png)
 ![Student Dashboard](docs/screenshots/student-dashboard.png)
+![Teacher Dashboard](docs/screenshots/teacher-dashboard.png)
 
 ## Tech stack
 
