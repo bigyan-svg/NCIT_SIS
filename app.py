@@ -1216,6 +1216,7 @@ def teacher_enter_result(course_id):
 
     conn = get_db()
     cur = conn.cursor(dictionary=True)
+    edit_result = None
 
     # Fetch course details
     cur.execute("SELECT course_id, course_name FROM courses WHERE course_id=%s", (course_id,))
@@ -1229,6 +1230,7 @@ def teacher_enter_result(course_id):
 
     if request.method == 'POST':
         try:
+            edit_result_id = request.form.get('edit_result_id')
             student_id = request.form['student_id']
             if not student_id:
                 flash("Please select a student.", "warning")
@@ -1251,27 +1253,49 @@ def teacher_enter_result(course_id):
 
             grade, gpa = calculate_grade_gpa(marks, full_marks)
 
-            # Check if record already exists
-            cur.execute("""
-                SELECT result_id FROM student_results 
-                WHERE student_id=%s AND course_id=%s AND exam_type=%s
-            """, (student_id, course_id, exam_type))
-            exists = cur.fetchone()
-
-            if exists:
+            if edit_result_id:
                 cur.execute("""
-                    UPDATE student_results 
-                    SET marks_obtained=%s, full_marks=%s, grade=%s, gpa=%s 
-                    WHERE result_id=%s
-                """, (marks, full_marks, grade, gpa, exists['result_id']))
+                    SELECT result_id
+                    FROM student_results
+                    WHERE result_id = %s AND course_id = %s
+                """, (edit_result_id, course_id))
+                target = cur.fetchone()
+                if not target:
+                    flash("Result not found for editing.", "danger")
+                    return redirect(url_for('teacher_enter_result', course_id=course_id))
+
+                cur.execute("""
+                    UPDATE student_results
+                    SET student_id = %s, exam_type = %s, marks_obtained = %s,
+                        full_marks = %s, grade = %s, gpa = %s
+                    WHERE result_id = %s AND course_id = %s
+                """, (
+                    student_id, exam_type, marks, full_marks, grade, gpa,
+                    edit_result_id, course_id
+                ))
                 flash(f"Updated {exam_type} result", "success")
             else:
+                # Check if record already exists
                 cur.execute("""
-                    INSERT INTO student_results 
-                    (student_id, course_id, marks_obtained, full_marks, grade, gpa, exam_type) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (student_id, course_id, marks, full_marks, grade, gpa, exam_type))
-                flash(f"Saved {exam_type} result", "success")
+                    SELECT result_id FROM student_results 
+                    WHERE student_id=%s AND course_id=%s AND exam_type=%s
+                """, (student_id, course_id, exam_type))
+                exists = cur.fetchone()
+
+                if exists:
+                    cur.execute("""
+                        UPDATE student_results 
+                        SET marks_obtained=%s, full_marks=%s, grade=%s, gpa=%s 
+                        WHERE result_id=%s
+                    """, (marks, full_marks, grade, gpa, exists['result_id']))
+                    flash(f"Updated {exam_type} result", "success")
+                else:
+                    cur.execute("""
+                        INSERT INTO student_results 
+                        (student_id, course_id, marks_obtained, full_marks, grade, gpa, exam_type) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """, (student_id, course_id, marks, full_marks, grade, gpa, exam_type))
+                    flash(f"Saved {exam_type} result", "success")
 
             conn.commit()
         except ValueError:
@@ -1280,6 +1304,17 @@ def teacher_enter_result(course_id):
             flash("Error saving result.", "danger")
 
         return redirect(url_for('teacher_enter_result', course_id=course_id))
+
+    edit_result_id = request.args.get('edit_result_id', type=int)
+    if edit_result_id:
+        cur.execute("""
+            SELECT result_id, student_id, exam_type, marks_obtained, full_marks
+            FROM student_results
+            WHERE result_id = %s AND course_id = %s
+        """, (edit_result_id, course_id))
+        edit_result = cur.fetchone()
+        if not edit_result:
+            flash("Result not found for editing.", "danger")
 
     # GET: Load enrolled students only
     cur.execute("""
@@ -1316,7 +1351,8 @@ def teacher_enter_result(course_id):
         course=course,
         students=students,
         results=results,
-        course_id=course_id
+        course_id=course_id,
+        edit_result=edit_result
     )
 
 @app.route('/teacher/result/delete/<int:result_id>', methods=['GET', 'POST'])

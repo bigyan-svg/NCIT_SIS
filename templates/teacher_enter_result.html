@@ -20,18 +20,19 @@
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 h-100" style="border-radius: 16px;">
                 <div class="card-header bg-white py-3 px-4 border-bottom">
-                    <h6 class="m-0 fw-bold text-success"><i class="fas fa-edit me-2"></i>New Entry</h6>
+                    <h6 class="m-0 fw-bold text-success"><i class="fas fa-edit me-2"></i>{% if edit_result %}Edit Entry{% else %}New Entry{% endif %}</h6>
                 </div>
                 
                 <div class="card-body p-4">
                     <form method="POST" class="row g-3">
+                        <input type="hidden" name="edit_result_id" value="{{ edit_result.result_id if edit_result else '' }}">
                         
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted"><i class="fas fa-user-graduate me-1"></i> Student</label>
                             <select name="student_id" class="form-select" required>
-                                <option value="" selected disabled>-- Select Student --</option>
+                                <option value="" {% if not edit_result %}selected{% endif %} disabled>-- Select Student --</option>
                                 {% for s in students %}
-                                <option value="{{ s[0] }}">{{ s[1] }} (ID: {{ s[2] }})</option>
+                                <option value="{{ s[0] }}" {% if edit_result and edit_result.student_id == s[0] %}selected{% endif %}>{{ s[1] }} (ID: {{ s[2] }})</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -39,28 +40,33 @@
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted"><i class="fas fa-tag me-1"></i> Assessment Type</label>
                             <select name="exam_type" class="form-select" required>
-                                <option value="Unit Test 1">Unit Test 1</option>
-                                <option value="Unit Test 2">Unit Test 2</option>
-                                <option value="Mid Term">Mid Term</option>
-                                <option value="Pre Board">Pre Board</option>
-                                <option value="Final">Final Exam</option>
-                                <option value="Assignment">Assignment</option>
+                                <option value="Unit Test 1" {% if edit_result and edit_result.exam_type == 'Unit Test 1' %}selected{% endif %}>Unit Test 1</option>
+                                <option value="Unit Test 2" {% if edit_result and edit_result.exam_type == 'Unit Test 2' %}selected{% endif %}>Unit Test 2</option>
+                                <option value="Mid Term" {% if edit_result and edit_result.exam_type == 'Mid Term' %}selected{% endif %}>Mid Term</option>
+                                <option value="Pre Board" {% if edit_result and edit_result.exam_type == 'Pre Board' %}selected{% endif %}>Pre Board</option>
+                                <option value="Final" {% if edit_result and edit_result.exam_type == 'Final' %}selected{% endif %}>Final Exam</option>
+                                <option value="Assignment" {% if edit_result and edit_result.exam_type == 'Assignment' %}selected{% endif %}>Assignment</option>
                             </select>
                         </div>
 
                         <div class="col-6">
                             <label class="form-label small fw-bold text-muted"><i class="fas fa-star-half-alt me-1"></i> Obtained</label>
-                            <input type="number" step="0.01" min="0" name="marks" class="form-control" placeholder="0.00" required>
+                            <input type="number" step="0.01" min="0" name="marks" class="form-control" placeholder="0.00" value="{{ edit_result.marks_obtained if edit_result else '' }}" required>
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-bold text-muted"><i class="fas fa-star me-1"></i> Total</label>
-                            <input type="number" step="0.01" min="0" name="full_marks" class="form-control" placeholder="100" required>
+                            <input type="number" step="0.01" min="0" name="full_marks" class="form-control" placeholder="100" value="{{ edit_result.full_marks if edit_result else '' }}" required>
                         </div>
 
                         <div class="col-12 mt-4">
                             <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
-                                <i class="fas fa-save me-2"></i> Save Result
+                                <i class="fas fa-save me-2"></i> {% if edit_result %}Update Result{% else %}Save Result{% endif %}
                             </button>
+                            {% if edit_result %}
+                            <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="btn btn-secondary w-100 mt-2">
+                                Cancel
+                            </a>
+                            {% endif %}
                         </div>
                     </form>
                 </div>
@@ -116,6 +122,11 @@
                                     </td>
 
                                     <td class="text-end pe-4">
+                                        <a href="{{ url_for('teacher_enter_result', course_id=course_id, edit_result_id=r[6]) }}"
+                                           class="btn btn-outline-primary btn-sm border-0"
+                                           title="Edit Entry">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                         <a href="{{ url_for('teacher_delete_result', result_id=r[6]) }}" 
                                            class="btn btn-outline-danger btn-sm border-0" 
                                            title="Delete Entry"
