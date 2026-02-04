@@ -1694,7 +1694,7 @@ def library_view():
             br.fine
         FROM borrows br
         JOIN library_books b ON br.book_id = b.book_id
-        WHERE br.student_id = %s
+        WHERE br.student_id = %s AND br.return_date IS NULL
         ORDER BY br.borrow_date DESC
     """
     cur.execute(my_borrows_query, (student_id,))
