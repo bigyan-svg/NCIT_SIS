@@ -22,17 +22,18 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Schedule New Exam</h5>
+            <h5 class="mb-0">{% if edit_exam %}Edit Exam{% else %}Schedule New Exam{% endif %}</h5>
         </div>
         <div class="card-body">
             <form method="POST" class="row g-3">
+                <input type="hidden" name="edit_id" value="{{ edit_exam.exam_id if edit_exam else '' }}">
                 
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Select Course</label>
                     <select name="course_id" class="form-select" required>
-                        <option value="" selected disabled>Choose a course...</option>
+                        <option value="" {% if not edit_exam %}selected{% endif %} disabled>Choose a course...</option>
                         {% for c in courses %}
-                            <option value="{{ c['course_id'] }}">{{ c['course_name'] }}</option>
+                            <option value="{{ c['course_id'] }}" {% if edit_exam and edit_exam.course_id == c['course_id'] %}selected{% endif %}>{{ c['course_name'] }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -44,23 +45,27 @@
 
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Date</label>
-                    <input type="date" name="exam_date" class="form-control" required>
+                    <input type="date" name="exam_date" class="form-control" value="{{ edit_exam.exam_date if edit_exam else '' }}" required>
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Start Time</label>
-                    <input type="time" name="exam_time" class="form-control" required>
+                    <input type="time" name="exam_time" class="form-control" value="{{ edit_exam.start_time.strftime('%H:%M') if edit_exam and edit_exam.start_time else '' }}" required>
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Room No</label>
-                    <input type="text" name="room_no" class="form-control" placeholder="e.g. 401-A" required>
+                    <input type="text" name="room_no" class="form-control" placeholder="e.g. 401-A" value="{{ edit_exam.room_no if edit_exam else '' }}" required>
                 </div>
 
                 <div class="col-md-2 align-self-end">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-calendar-plus me-1"></i> Schedule
+                        <i class="fas {% if edit_exam %}fa-save{% else %}fa-calendar-plus{% endif %} me-1"></i>
+                        {% if edit_exam %}Update{% else %}Schedule{% endif %}
                     </button>
+                    {% if edit_exam %}
+                    <a href="{{ url_for('manage_exams') }}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -89,6 +94,10 @@
                         <td class="fw-bold">{{ e['course_name'] }}</td>
                         <td>{{ e['room_no'] }}</td>
                         <td>
+                            <a href="{{ url_for('manage_exams', edit_id=e['exam_id']) }}"
+                               class="btn btn-primary btn-sm me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
                             <a href="{{ url_for('delete_exam', id=e['exam_id']) }}" 
                                class="btn btn-danger btn-sm"
                                onclick="return confirm('Are you sure you want to cancel this exam?')">

@@ -22,42 +22,43 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Add New Teacher</h5>
+            <h5 class="mb-0">{% if edit_teacher %}Edit Teacher{% else %}Add New Teacher{% endif %}</h5>
         </div>
         <div class="card-body">
             <form method="POST">
+                <input type="hidden" name="edit_id" value="{{ edit_teacher.user_id if edit_teacher else '' }}">
                 <div class="row g-3">
                     
                     <div class="col-12"><h6 class="text-muted border-bottom pb-2">Personal Details</h6></div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Full Name</label>
-                        <input type="text" name="full_name" class="form-control" placeholder="Dr. Jane Doe" required>
+                        <input type="text" name="full_name" class="form-control" placeholder="Dr. Jane Doe" value="{{ edit_teacher.full_name if edit_teacher else '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="teacher@example.com" required>
+                        <input type="email" name="email" class="form-control" placeholder="teacher@example.com" value="{{ edit_teacher.email if edit_teacher else '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Contact Number</label>
-                        <input type="tel" name="contact_no" class="form-control" placeholder="+977-98xxxxxxxx" required>
+                        <input type="tel" name="contact_no" class="form-control" placeholder="+977-98xxxxxxxx" value="{{ edit_teacher.contact_no if edit_teacher else '' }}" required>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Gender</label>
                         <select name="gender" class="form-select" required>
-                            <option value="" selected disabled>Select...</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="" {% if not edit_teacher %}selected{% endif %} disabled>Select...</option>
+                            <option value="Male" {% if edit_teacher and edit_teacher.gender and edit_teacher.gender|lower == 'male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if edit_teacher and edit_teacher.gender and edit_teacher.gender|lower == 'female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if edit_teacher and edit_teacher.gender and edit_teacher.gender|lower == 'other' %}selected{% endif %}>Other</option>
                         </select>
                     </div>
 
                     <div class="col-md-9">
                         <label class="form-label fw-bold">Address</label>
-                        <input type="text" name="address" class="form-control" placeholder="Permanent Address" required>
+                        <input type="text" name="address" class="form-control" placeholder="Permanent Address" value="{{ edit_teacher.address if edit_teacher else '' }}" required>
                     </div>
 
                     <div class="col-12 mt-4"><h6 class="text-muted border-bottom pb-2">Department & Login</h6></div>
@@ -65,22 +66,26 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Department</label>
                         <select name="dept_id" class="form-select" required>
-                            <option value="" selected disabled>Select Department</option>
+                            <option value="" {% if not edit_teacher %}selected{% endif %} disabled>Select Department</option>
                             {% for d in departments %}
-                                <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
+                                <option value="{{ d.dept_id }}" {% if edit_teacher and edit_teacher.dept_id == d.dept_id %}selected{% endif %}>{{ d.dept_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Login Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="{% if edit_teacher %}Leave blank to keep current password{% else %}Login Password{% endif %}" {% if not edit_teacher %}required{% endif %}>
                     </div>
 
                     <div class="col-12 text-end mt-4">
                         <button type="submit" class="btn btn-success px-4">
-                            <i class="fas fa-user-plus me-1"></i> Add Teacher
+                            <i class="fas {% if edit_teacher %}fa-save{% else %}fa-user-plus{% endif %} me-1"></i>
+                            {% if edit_teacher %}Update Teacher{% else %}Add Teacher{% endif %}
                         </button>
+                        {% if edit_teacher %}
+                        <a href="{{ url_for('manage_teachers') }}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -141,6 +146,10 @@
                             <td><small>{{ t.email }}</small></td>
                             <td><span class="text-muted text-truncate d-inline-block" style="max-width: 150px;" title="{{ t.address }}">{{ t.address or '-' }}</span></td>
                             <td>
+                                <a href="{{ url_for('manage_teachers', edit_id=t.user_id) }}"
+                                   class="btn btn-primary btn-sm me-1">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
                                 <a href="{{ url_for('delete_teacher', id=t.user_id) }}" 
                                    class="btn btn-danger btn-sm"
                                    onclick="return confirm('Delete teacher {{ t.full_name }}? This will remove them from the system.')">

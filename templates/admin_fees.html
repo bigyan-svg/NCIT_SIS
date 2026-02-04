@@ -22,17 +22,18 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Create New Invoice</h5>
+            <h5 class="mb-0">{% if edit_fee %}Edit Invoice{% else %}Create New Invoice{% endif %}</h5>
         </div>
         <div class="card-body">
             <form method="POST" class="row g-3 align-items-end">
+                <input type="hidden" name="edit_id" value="{{ edit_fee.fee_id if edit_fee else '' }}">
                 
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Student</label>
                     <select name="student_id" class="form-select" required>
-                        <option value="" selected disabled>Select Student...</option>
+                        <option value="" {% if not edit_fee %}selected{% endif %} disabled>Select Student...</option>
                         {% for s in students %}
-                            <option value="{{ s['user_id'] }}">{{ s['full_name'] }}</option>
+                            <option value="{{ s['user_id'] }}" {% if edit_fee and edit_fee.student_id == s['user_id'] %}selected{% endif %}>{{ s['full_name'] }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -41,27 +42,31 @@
                     <label class="form-label fw-bold">Amount</label>
                     <div class="input-group">
                         <span class="input-group-text">Rs.</span>
-                        <input type="number" name="amount" class="form-control" placeholder="0.00" required>
+                        <input type="number" name="amount" class="form-control" placeholder="0.00" value="{{ edit_fee.amount if edit_fee else '' }}" required>
                     </div>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Description</label>
-                    <input type="text" name="description" class="form-control" placeholder="e.g. Semester Fee, Lab Fee">
+                    <input type="text" name="description" class="form-control" placeholder="e.g. Semester Fee, Lab Fee" value="{{ edit_fee.description if edit_fee else '' }}">
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Status</label>
                     <select name="status" class="form-select" required>
-                        <option value="Pending" selected>Pending</option>
-                        <option value="Paid">Paid</option>
+                        <option value="Pending" {% if not edit_fee or edit_fee.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Paid" {% if edit_fee and edit_fee.status == 'Paid' %}selected{% endif %}>Paid</option>
                     </select>
                 </div>
 
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-file-invoice-dollar me-1"></i> Invoice
+                        <i class="fas {% if edit_fee %}fa-save{% else %}fa-file-invoice-dollar{% endif %} me-1"></i>
+                        {% if edit_fee %}Update{% else %}Invoice{% endif %}
                     </button>
+                    {% if edit_fee %}
+                    <a href="{{ url_for('manage_fees') }}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -96,6 +101,10 @@
                             {% endif %}
                         </td>
                         <td>
+                            <a href="{{ url_for('manage_fees', edit_id=f['fee_id']) }}"
+                               class="btn btn-primary btn-sm me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
                             <a href="{{ url_for('delete_fee', id=f['fee_id']) }}" 
                                class="btn btn-danger btn-sm"
                                onclick="return confirm('Are you sure you want to delete this invoice?')">

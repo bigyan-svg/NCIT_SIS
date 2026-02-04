@@ -22,57 +22,58 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Register New Student</h5>
+            <h5 class="mb-0">{% if edit_student %}Edit Student{% else %}Register New Student{% endif %}</h5>
         </div>
         <div class="card-body">
             <form method="POST">
+                <input type="hidden" name="edit_id" value="{{ edit_student.user_id if edit_student else '' }}">
                 <div class="row g-3">
                     
                     <div class="col-12"><h6 class="text-muted border-bottom pb-2">Personal Details</h6></div>
                     
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Full Name</label>
-                        <input type="text" name="full_name" class="form-control" placeholder="John Doe" required>
+                        <input type="text" name="full_name" class="form-control" placeholder="John Doe" value="{{ edit_student.full_name if edit_student else '' }}" required>
                     </div>
                     
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="student@example.com" required>
+                        <input type="email" name="email" class="form-control" placeholder="student@example.com" value="{{ edit_student.email if edit_student else '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Contact Number</label>
-                        <input type="tel" name="contact_no" class="form-control" placeholder="+977-98xxxxxxxx" required>
+                        <input type="tel" name="contact_no" class="form-control" placeholder="+977-98xxxxxxxx" value="{{ edit_student.contact_no if edit_student else '' }}" required>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Gender</label>
                         <select name="gender" class="form-select" required>
-                            <option value="" selected disabled>Select...</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="" {% if not edit_student %}selected{% endif %} disabled>Select...</option>
+                            <option value="Male" {% if edit_student and edit_student.gender and edit_student.gender|lower == 'male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if edit_student and edit_student.gender and edit_student.gender|lower == 'female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if edit_student and edit_student.gender and edit_student.gender|lower == 'other' %}selected{% endif %}>Other</option>
                         </select>
                     </div>
 
                     <div class="col-md-9">
                         <label class="form-label fw-bold">Address</label>
-                        <input type="text" name="address" class="form-control" placeholder="Permanent Address" required>
+                        <input type="text" name="address" class="form-control" placeholder="Permanent Address" value="{{ edit_student.address if edit_student else '' }}" required>
                     </div>
 
                     <div class="col-12 mt-4"><h6 class="text-muted border-bottom pb-2">Academic Information</h6></div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Roll No</label>
-                        <input type="text" name="roll_no" class="form-control" placeholder="e.g. 21CS001" required>
+                        <input type="text" name="roll_no" class="form-control" placeholder="e.g. 21CS001" value="{{ edit_student.roll_no if edit_student else '' }}" required>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Department</label>
                         <select name="dept_id" class="form-select" required>
-                            <option value="" selected disabled>Select Dept</option>
+                            <option value="" {% if not edit_student %}selected{% endif %} disabled>Select Dept</option>
                             {% for d in departments %}
-                                <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
+                                <option value="{{ d.dept_id }}" {% if edit_student and edit_student.dept_id == d.dept_id %}selected{% endif %}>{{ d.dept_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -80,32 +81,36 @@
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Semester</label>
                         <select name="semester" class="form-select" required>
-                            <option value="" selected disabled>Select Sem</option>
-                            <option value="1st">1st Semester</option>
-                            <option value="2nd">2nd Semester</option>
-                            <option value="3rd">3rd Semester</option>
-                            <option value="4th">4th Semester</option>
-                            <option value="5th">5th Semester</option>
-                            <option value="6th">6th Semester</option>
-                            <option value="7th">7th Semester</option>
-                            <option value="8th">8th Semester</option>
+                            <option value="" {% if not edit_student %}selected{% endif %} disabled>Select Sem</option>
+                            <option value="1st" {% if edit_student and edit_student.semester == '1st' %}selected{% endif %}>1st Semester</option>
+                            <option value="2nd" {% if edit_student and edit_student.semester == '2nd' %}selected{% endif %}>2nd Semester</option>
+                            <option value="3rd" {% if edit_student and edit_student.semester == '3rd' %}selected{% endif %}>3rd Semester</option>
+                            <option value="4th" {% if edit_student and edit_student.semester == '4th' %}selected{% endif %}>4th Semester</option>
+                            <option value="5th" {% if edit_student and edit_student.semester == '5th' %}selected{% endif %}>5th Semester</option>
+                            <option value="6th" {% if edit_student and edit_student.semester == '6th' %}selected{% endif %}>6th Semester</option>
+                            <option value="7th" {% if edit_student and edit_student.semester == '7th' %}selected{% endif %}>7th Semester</option>
+                            <option value="8th" {% if edit_student and edit_student.semester == '8th' %}selected{% endif %}>8th Semester</option>
                         </select>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Enrollment Date</label>
-                        <input type="date" name="enroll_date" class="form-control" value="{{ today }}" required>
+                        <input type="date" name="enroll_date" class="form-control" value="{{ edit_student.enroll_date if edit_student else today }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Login Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="{% if edit_student %}Leave blank to keep current password{% else %}Login Password{% endif %}" {% if not edit_student %}required{% endif %}>
                     </div>
 
                     <div class="col-12 text-end mt-4">
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-user-plus me-1"></i> Add Student
+                            <i class="fas {% if edit_student %}fa-save{% else %}fa-user-plus{% endif %} me-1"></i>
+                            {% if edit_student %}Update Student{% else %}Add Student{% endif %}
                         </button>
+                        {% if edit_student %}
+                        <a href="{{ url_for('manage_students') }}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -170,6 +175,10 @@
                             <td><small>{{ s.email }}</small></td>
                             <td>{{ s.enroll_date or '-' }}</td>
                             <td>
+                                <a href="{{ url_for('manage_students', edit_id=s.user_id) }}"
+                                   class="btn btn-primary btn-sm me-1">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
                                 <a href="{{ url_for('delete_student', id=s.user_id) }}" 
                                    class="btn btn-danger btn-sm"
                                    onclick="return confirm('Delete student {{ s.full_name }}? This will remove all their records including results and fees.')">

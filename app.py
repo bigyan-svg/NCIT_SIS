@@ -255,6 +255,7 @@ def admin_library():
     
     conn = get_db()
     cur = conn.cursor(dictionary=True)
+    edit_book = None
     
     try:
         # --- 1. Handle POST Actions (Delete Book) ---
@@ -274,6 +275,17 @@ def admin_library():
 
         # --- 2. Search Logic ---
         search_query = request.args.get('search_query')
+        edit_book_id = request.args.get('edit_book_id', type=int)
+
+        if edit_book_id:
+            cur.execute("""
+                SELECT book_id, title, author, category_id, isbn, copies_total
+                FROM library_books
+                WHERE book_id = %s
+            """, (edit_book_id,))
+            edit_book = cur.fetchone()
+            if not edit_book:
+                flash("Book not found for editing.", "danger")
 
         # --- 3. Fetch Categories (Always fetch all for the "Add Book" dropdown) ---
         cur.execute("SELECT * FROM book_categories ORDER BY name")
@@ -336,12 +348,19 @@ def admin_library():
         categories = []
         books = []
         borrows = []
+        edit_book = None
     
     finally:
         cur.close()
         conn.close()
         
-    return render_template('admin_library.html', categories=categories, books=books, borrows=borrows)
+    return render_template(
+        'admin_library.html',
+        categories=categories,
+        books=books,
+        borrows=borrows,
+        edit_book=edit_book
+    )
 
 @app.route('/admin/library/add_category', methods=['POST'])
 def add_category():
@@ -363,6 +382,7 @@ def add_category():
 def add_book():
     if not check_auth('admin'): return redirect(url_for('login'))
     
+    book_id = request.form.get('book_id')
     title = request.form.get('title')
     author = request.form.get('author')
     category_id = request.form.get('category')
@@ -373,13 +393,21 @@ def add_book():
         try:
             conn = get_db()
             cur = conn.cursor()
-            cur.execute("""
-                INSERT INTO library_books (title, author, category_id, isbn, copies_total) 
-                VALUES (%s, %s, %s, %s, %s)
-            """, (title, author, category_id, isbn, copies))
+            if book_id:
+                cur.execute("""
+                    UPDATE library_books
+                    SET title = %s, author = %s, category_id = %s, isbn = %s, copies_total = %s
+                    WHERE book_id = %s
+                """, (title, author, category_id, isbn, copies, book_id))
+                flash('Book updated successfully!', 'success')
+            else:
+                cur.execute("""
+                    INSERT INTO library_books (title, author, category_id, isbn, copies_total) 
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (title, author, category_id, isbn, copies))
+                flash('Book added successfully!', 'success')
             conn.commit()
             conn.close()
-            flash('Book added successfully!', 'success')
         except mysql.connector.Error as err:
             flash(f'Error adding book: {err}', 'danger')
     else:
@@ -428,16 +456,28 @@ def manage_departments():
     
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
+    edit_department = None
 
     # --- Handle Adding New Department ---
     if request.method == 'POST':
         dept_name = request.form['dept_name']
         hod_name = request.form.get('hod_name') # Optional field
+        edit_id = request.form.get('edit_id')
 
-        cursor.execute("INSERT INTO departments (dept_name, hod_name) VALUES (%s, %s)", 
-                       (dept_name, hod_name))
+        if edit_id:
+            cursor.execute(
+                "UPDATE departments SET dept_name = %s, hod_name = %s WHERE dept_id = %s",
+                (dept_name, hod_name, edit_id)
+            )
+            flash('Department updated successfully!', 'success')
+        else:
+            cursor.execute(
+                "INSERT INTO departments (dept_name, hod_name) VALUES (%s, %s)",
+                (dept_name, hod_name)
+            )
+            flash('Department added successfully!', 'success')
+
         conn.commit()
-        flash('Department added successfully!', 'success')
         conn.close()
         return redirect(url_for('manage_departments'))
 
@@ -459,9 +499,23 @@ def manage_departments():
         cursor.execute("SELECT * FROM departments ORDER BY dept_id DESC")
     
     departments = cursor.fetchall()
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cursor.execute(
+            "SELECT dept_id, dept_name, hod_name FROM departments WHERE dept_id = %s",
+            (edit_id,)
+        )
+        edit_department = cursor.fetchone()
+        if not edit_department:
+            flash("Department not found for editing.", "danger")
+
     conn.close()
 
-    return render_template('admin_departments.html', departments=departments)
+    return render_template(
+        'admin_departments.html',
+        departments=departments,
+        edit_department=edit_department
+    )
 
 @app.route('/admin/delete_dept/<int:id>')
 def delete_department(id):
@@ -483,33 +537,76 @@ def manage_students():
 
     conn = get_db()
     cur = conn.cursor(dictionary=True)
+    edit_student = None
 
     # --- 1. HANDLE ADDING NEW STUDENT (POST) ---
     if request.method == 'POST':
+        edit_id = request.form.get('edit_id')
         try:
             roll_no = request.form['roll_no'].strip().upper()
             contact_no = request.form['contact_no'].strip()
             gender = request.form['gender']
             address = request.form['address'].strip()
             enroll_date = request.form['enroll_date']
-            password_hash = generate_password_hash(request.form['password'])
-            
-            cur.execute("""INSERT INTO users 
-                           (roll_no, full_name, email, password, role, dept_id, semester, 
-                            enroll_date, contact_no, gender, address) 
-                           VALUES (%s, %s, %s, %s, 'student', %s, %s, %s, %s, %s, %s)""",
-                        (roll_no,
-                         request.form['full_name'].strip(),
-                         request.form['email'].strip(),
-                         password_hash,
-                         request.form['dept_id'],
-                         request.form['semester'],
-                         enroll_date if enroll_date else date.today(),
-                         contact_no,
-                         gender,
-                         address))
-            conn.commit()
-            flash("Student added successfully.", "success")
+            full_name = request.form['full_name'].strip()
+            email = request.form['email'].strip()
+            dept_id = request.form['dept_id']
+            semester = request.form['semester']
+
+            if edit_id:
+                cur.execute(
+                    "SELECT user_id FROM users WHERE user_id = %s AND role = 'student'",
+                    (edit_id,)
+                )
+                if not cur.fetchone():
+                    flash("Student not found.", "danger")
+                else:
+                    new_password = request.form.get('password', '').strip()
+                    if new_password:
+                        password_hash = generate_password_hash(new_password)
+                        cur.execute("""
+                            UPDATE users
+                            SET roll_no = %s, full_name = %s, email = %s, password = %s,
+                                dept_id = %s, semester = %s, enroll_date = %s,
+                                contact_no = %s, gender = %s, address = %s
+                            WHERE user_id = %s AND role = 'student'
+                        """, (
+                            roll_no, full_name, email, password_hash, dept_id, semester,
+                            enroll_date if enroll_date else date.today(),
+                            contact_no, gender, address, edit_id
+                        ))
+                    else:
+                        cur.execute("""
+                            UPDATE users
+                            SET roll_no = %s, full_name = %s, email = %s,
+                                dept_id = %s, semester = %s, enroll_date = %s,
+                                contact_no = %s, gender = %s, address = %s
+                            WHERE user_id = %s AND role = 'student'
+                        """, (
+                            roll_no, full_name, email, dept_id, semester,
+                            enroll_date if enroll_date else date.today(),
+                            contact_no, gender, address, edit_id
+                        ))
+                    conn.commit()
+                    flash("Student updated successfully.", "success")
+            else:
+                password_hash = generate_password_hash(request.form['password'])
+                cur.execute("""INSERT INTO users 
+                               (roll_no, full_name, email, password, role, dept_id, semester, 
+                                enroll_date, contact_no, gender, address) 
+                               VALUES (%s, %s, %s, %s, 'student', %s, %s, %s, %s, %s, %s)""",
+                            (roll_no,
+                             full_name,
+                             email,
+                             password_hash,
+                             dept_id,
+                             semester,
+                             enroll_date if enroll_date else date.today(),
+                             contact_no,
+                             gender,
+                             address))
+                conn.commit()
+                flash("Student added successfully.", "success")
         except mysql.connector.Error as e:
             conn.rollback()
             if e.errno == 1062:  # Duplicate entry
@@ -565,6 +662,18 @@ def manage_students():
     cur.execute("SELECT dept_id, dept_name FROM departments ORDER BY dept_name")
     departments = cur.fetchall()
 
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cur.execute("""
+            SELECT user_id, roll_no, full_name, email, dept_id, semester,
+                   enroll_date, contact_no, gender, address
+            FROM users
+            WHERE user_id = %s AND role = 'student'
+        """, (edit_id,))
+        edit_student = cur.fetchone()
+        if not edit_student:
+            flash("Student not found for editing.", "danger")
+
     today = date.today().isoformat()
 
     conn.close()
@@ -573,7 +682,8 @@ def manage_students():
         'admin_students.html',
         students=students,
         departments=departments,
-        today=today
+        today=today,
+        edit_student=edit_student
     )
 
 @app.route('/admin/delete_student/<int:id>', methods=['GET', 'POST'])
@@ -679,28 +789,54 @@ def manage_teachers():
 
     conn = get_db()
     cur = conn.cursor(dictionary=True)
+    edit_teacher = None
 
     # --- 1. HANDLE ADDING NEW TEACHER (POST) ---
     if request.method == 'POST':
+        edit_id = request.form.get('edit_id')
         try:
             contact_no = request.form['contact_no'].strip()
             gender = request.form['gender']
             address = request.form['address'].strip()
-            password_hash = generate_password_hash(request.form['password'])
-            
-            cur.execute("""INSERT INTO users 
-                           (full_name, email, password, role, dept_id, 
-                            contact_no, gender, address) 
-                           VALUES (%s, %s, %s, 'teacher', %s, %s, %s, %s)""",
-                        (request.form['full_name'].strip(),
-                         request.form['email'].strip(),
-                         password_hash,
-                         request.form['dept_id'],
-                         contact_no,
-                         gender,
-                         address))
-            conn.commit()
-            flash("Teacher added successfully.", "success")
+            full_name = request.form['full_name'].strip()
+            email = request.form['email'].strip()
+            dept_id = request.form['dept_id']
+
+            if edit_id:
+                cur.execute(
+                    "SELECT user_id FROM users WHERE user_id = %s AND role = 'teacher'",
+                    (edit_id,)
+                )
+                if not cur.fetchone():
+                    flash("Teacher not found.", "danger")
+                else:
+                    new_password = request.form.get('password', '').strip()
+                    if new_password:
+                        password_hash = generate_password_hash(new_password)
+                        cur.execute("""
+                            UPDATE users
+                            SET full_name = %s, email = %s, password = %s, dept_id = %s,
+                                contact_no = %s, gender = %s, address = %s
+                            WHERE user_id = %s AND role = 'teacher'
+                        """, (full_name, email, password_hash, dept_id, contact_no, gender, address, edit_id))
+                    else:
+                        cur.execute("""
+                            UPDATE users
+                            SET full_name = %s, email = %s, dept_id = %s,
+                                contact_no = %s, gender = %s, address = %s
+                            WHERE user_id = %s AND role = 'teacher'
+                        """, (full_name, email, dept_id, contact_no, gender, address, edit_id))
+                    conn.commit()
+                    flash("Teacher updated successfully.", "success")
+            else:
+                password_hash = generate_password_hash(request.form['password'])
+                cur.execute("""INSERT INTO users 
+                               (full_name, email, password, role, dept_id, 
+                                contact_no, gender, address) 
+                               VALUES (%s, %s, %s, 'teacher', %s, %s, %s, %s)""",
+                            (full_name, email, password_hash, dept_id, contact_no, gender, address))
+                conn.commit()
+                flash("Teacher added successfully.", "success")
         except mysql.connector.Error as e:
             conn.rollback()
             if e.errno == 1062:  # Duplicate entry
@@ -750,12 +886,24 @@ def manage_teachers():
     cur.execute("SELECT dept_id, dept_name FROM departments ORDER BY dept_name")
     departments = cur.fetchall()
 
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cur.execute("""
+            SELECT user_id, full_name, email, dept_id, contact_no, gender, address
+            FROM users
+            WHERE user_id = %s AND role = 'teacher'
+        """, (edit_id,))
+        edit_teacher = cur.fetchone()
+        if not edit_teacher:
+            flash("Teacher not found for editing.", "danger")
+
     conn.close()
 
     return render_template(
         'admin_teachers.html',
         teachers=teachers,
-        departments=departments
+        departments=departments,
+        edit_teacher=edit_teacher
     )
 
 @app.route('/admin/delete_teacher/<int:id>')
@@ -771,17 +919,54 @@ def delete_teacher(id):
 def manage_courses():
     if not check_auth('admin'): return redirect(url_for('login'))
     conn = get_db(); cur = conn.cursor(dictionary=True)
+    edit_course = None
+
     if request.method == 'POST':
-        cur.execute("INSERT INTO courses (course_name, course_code, dept_id) VALUES (%s, %s, %s)",
-                    (request.form['course_name'], request.form['course_code'], request.form['dept_id']))
-        conn.commit(); flash("Course Added")
+        edit_id = request.form.get('edit_id')
+        try:
+            if edit_id:
+                cur.execute("""
+                    UPDATE courses
+                    SET course_name = %s, course_code = %s, dept_id = %s
+                    WHERE course_id = %s
+                """, (request.form['course_name'], request.form['course_code'], request.form['dept_id'], edit_id))
+                flash("Course Updated")
+            else:
+                cur.execute("""
+                    INSERT INTO courses (course_name, course_code, dept_id)
+                    VALUES (%s, %s, %s)
+                """, (request.form['course_name'], request.form['course_code'], request.form['dept_id']))
+                flash("Course Added")
+            conn.commit()
+        except mysql.connector.Error as e:
+            conn.rollback()
+            if e.errno == 1062:
+                flash("Error: Course code already exists.", "danger")
+            else:
+                flash(f"Error saving course: {e}", "danger")
         return redirect(url_for('manage_courses'))
-    cur.execute("SELECT c.course_id, c.course_name, c.course_code, d.dept_name FROM courses c LEFT JOIN departments d ON c.dept_id=d.dept_id")
+    cur.execute("""
+        SELECT c.course_id, c.course_name, c.course_code, c.dept_id, d.dept_name
+        FROM courses c
+        LEFT JOIN departments d ON c.dept_id = d.dept_id
+    """)
     courses = cur.fetchall()
     cur.execute("SELECT * FROM departments")
     depts = cur.fetchall()
+
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cur.execute("""
+            SELECT course_id, course_name, course_code, dept_id
+            FROM courses
+            WHERE course_id = %s
+        """, (edit_id,))
+        edit_course = cur.fetchone()
+        if not edit_course:
+            flash("Course not found for editing.", "danger")
+
     conn.close()
-    return render_template('admin_courses.html', courses=courses, departments=depts)
+    return render_template('admin_courses.html', courses=courses, departments=depts, edit_course=edit_course)
 
 @app.route('/admin/delete_course/<int:id>')
 def delete_course(id):
@@ -823,17 +1008,58 @@ def delete_assignment(id):
 def manage_exams():
     if not check_auth('admin'): return redirect(url_for('login'))
     conn = get_db(); cur = conn.cursor(dictionary=True)
+    edit_exam = None
+
     if request.method == 'POST':
-        cur.execute("INSERT INTO exam_schedule (course_id, exam_date, start_time, room_no) VALUES (%s, %s, %s, %s)",
-                    (request.form['course_id'], request.form['exam_date'], request.form['exam_time'], request.form['room_no']))
-        conn.commit(); flash("Exam Scheduled")
+        edit_id = request.form.get('edit_id')
+        if edit_id:
+            cur.execute("""
+                UPDATE exam_schedule
+                SET course_id = %s, exam_date = %s, start_time = %s, room_no = %s
+                WHERE exam_id = %s
+            """, (
+                request.form['course_id'],
+                request.form['exam_date'],
+                request.form['exam_time'],
+                request.form['room_no'],
+                edit_id
+            ))
+            conn.commit(); flash("Exam Updated")
+        else:
+            cur.execute("""
+                INSERT INTO exam_schedule (course_id, exam_date, start_time, room_no)
+                VALUES (%s, %s, %s, %s)
+            """, (
+                request.form['course_id'],
+                request.form['exam_date'],
+                request.form['exam_time'],
+                request.form['room_no']
+            ))
+            conn.commit(); flash("Exam Scheduled")
         return redirect(url_for('manage_exams'))
-    cur.execute("SELECT e.exam_id, c.course_name, e.exam_date, e.start_time, e.room_no FROM exam_schedule e JOIN courses c ON e.course_id=c.course_id ORDER BY e.exam_date")
+    cur.execute("""
+        SELECT e.exam_id, e.course_id, c.course_name, e.exam_date, e.start_time, e.room_no
+        FROM exam_schedule e
+        JOIN courses c ON e.course_id = c.course_id
+        ORDER BY e.exam_date
+    """)
     exams = cur.fetchall()
     cur.execute("SELECT course_id, course_name FROM courses")
     courses = cur.fetchall()
+
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cur.execute("""
+            SELECT exam_id, course_id, exam_date, start_time, room_no
+            FROM exam_schedule
+            WHERE exam_id = %s
+        """, (edit_id,))
+        edit_exam = cur.fetchone()
+        if not edit_exam:
+            flash("Exam not found for editing.", "danger")
+
     conn.close()
-    return render_template('admin_exams.html', exams=exams, courses=courses)
+    return render_template('admin_exams.html', exams=exams, courses=courses, edit_exam=edit_exam)
 
 @app.route('/admin/delete_exam/<int:id>')
 def delete_exam(id):
@@ -848,17 +1074,58 @@ def delete_exam(id):
 def manage_fees():
     if not check_auth('admin'): return redirect(url_for('login'))
     conn = get_db(); cur = conn.cursor(dictionary=True)
+    edit_fee = None
+
     if request.method == 'POST':
-        cur.execute("INSERT INTO fees (student_id, amount, description, status) VALUES (%s, %s, %s, %s)",
-                    (request.form['student_id'], request.form['amount'], request.form['description'], request.form['status']))
-        conn.commit(); flash("Invoice Created")
+        edit_id = request.form.get('edit_id')
+        if edit_id:
+            cur.execute("""
+                UPDATE fees
+                SET student_id = %s, amount = %s, description = %s, status = %s
+                WHERE fee_id = %s
+            """, (
+                request.form['student_id'],
+                request.form['amount'],
+                request.form['description'],
+                request.form['status'],
+                edit_id
+            ))
+            conn.commit(); flash("Invoice Updated")
+        else:
+            cur.execute("""
+                INSERT INTO fees (student_id, amount, description, status)
+                VALUES (%s, %s, %s, %s)
+            """, (
+                request.form['student_id'],
+                request.form['amount'],
+                request.form['description'],
+                request.form['status']
+            ))
+            conn.commit(); flash("Invoice Created")
         return redirect(url_for('manage_fees'))
-    cur.execute("SELECT f.fee_id, u.full_name, f.amount, f.description, f.status FROM fees f JOIN users u ON f.student_id=u.user_id ORDER BY f.fee_id DESC")
+    cur.execute("""
+        SELECT f.fee_id, f.student_id, u.full_name, f.amount, f.description, f.status
+        FROM fees f
+        JOIN users u ON f.student_id = u.user_id
+        ORDER BY f.fee_id DESC
+    """)
     fees = cur.fetchall()
     cur.execute("SELECT user_id, full_name FROM users WHERE role='student'")
     students = cur.fetchall()
+
+    edit_id = request.args.get('edit_id', type=int)
+    if edit_id:
+        cur.execute("""
+            SELECT fee_id, student_id, amount, description, status
+            FROM fees
+            WHERE fee_id = %s
+        """, (edit_id,))
+        edit_fee = cur.fetchone()
+        if not edit_fee:
+            flash("Invoice not found for editing.", "danger")
+
     conn.close()
-    return render_template('admin_fees.html', fees=fees, students=students)
+    return render_template('admin_fees.html', fees=fees, students=students, edit_fee=edit_fee)
 
 @app.route('/admin/delete_fee/<int:id>')
 def delete_fee(id):

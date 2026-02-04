@@ -22,25 +22,30 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Add New Department</h5>
+            <h5 class="mb-0">{% if edit_department %}Edit Department{% else %}Add New Department{% endif %}</h5>
         </div>
         <div class="card-body">
             <form method="POST" class="row g-3 align-items-end">
+                <input type="hidden" name="edit_id" value="{{ edit_department.dept_id if edit_department else '' }}">
                 
                 <div class="col-md-5">
                     <label class="form-label fw-bold">Department Name</label>
-                    <input type="text" name="dept_name" class="form-control" placeholder="e.g. Computer Engineering" required>
+                    <input type="text" name="dept_name" class="form-control" placeholder="e.g. Computer Engineering" value="{{ edit_department.dept_name if edit_department else '' }}" required>
                 </div>
 
                 <div class="col-md-5">
                     <label class="form-label fw-bold">HOD Name</label>
-                    <input type="text" name="hod_name" class="form-control" placeholder="e.g. Dr. Sharma">
+                    <input type="text" name="hod_name" class="form-control" placeholder="e.g. Dr. Sharma" value="{{ edit_department.hod_name if edit_department else '' }}">
                 </div>
 
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-plus-circle me-1"></i> Add Dept
+                        <i class="fas {% if edit_department %}fa-save{% else %}fa-plus-circle{% endif %} me-1"></i>
+                        {% if edit_department %}Update Dept{% else %}Add Dept{% endif %}
                     </button>
+                    {% if edit_department %}
+                    <a href="{{ url_for('manage_departments') }}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -98,6 +103,10 @@
                             {% endif %}
                         </td>
                         <td>
+                            <a href="{{ url_for('manage_departments', edit_id=d['dept_id']) }}"
+                               class="btn btn-primary btn-sm me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
                             <a href="{{ url_for('delete_department', id=d['dept_id']) }}" 
                                class="btn btn-danger btn-sm"
                                onclick="return confirm('Are you sure you want to delete {{ d.dept_name }}? This might affect students in this department.')">
