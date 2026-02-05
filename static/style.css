@@ -1233,12 +1233,13 @@ textarea:focus-visible {
 .stat-card {
     border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.35);
-    color: #fff;
+    color: var(--ink);
     overflow: hidden;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: var(--shadow-sm);
     min-height: 140px;
+    background: var(--glass-strong);
 }
 
 .stat-card .card-body {
@@ -1258,9 +1259,44 @@ textarea:focus-visible {
     top: 50%;
     transform: translateY(-50%) rotate(-12deg);
     font-size: 4.4rem;
-    opacity: 0.18;
+    opacity: 0.12;
     z-index: 1;
     pointer-events: none;
+}
+
+.stat-card.bg-gradient-primary,
+.stat-card.bg-gradient-success,
+.stat-card.bg-gradient-info,
+.stat-card.bg-gradient-warning,
+.stat-card.bg-gradient-red,
+.stat-card.bg-gradient-blue,
+.stat-card.bg-gradient-green {
+    color: #fff;
+}
+
+.stat-card.bg-gradient-primary { background: linear-gradient(135deg, #00b7ff 0%, #3b82f6 100%); }
+.stat-card.bg-gradient-success { background: linear-gradient(135deg, #22c55e 0%, #10b981 100%); }
+.stat-card.bg-gradient-info { background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%); }
+.stat-card.bg-gradient-warning { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); }
+.stat-card.bg-gradient-red { background: linear-gradient(135deg, #ef4444 0%, #fb7185 100%); }
+.stat-card.bg-gradient-blue { background: linear-gradient(135deg, #00b7ff 0%, #3b82f6 100%); }
+.stat-card.bg-gradient-green { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+
+.stat-card.bg-gradient-primary .text-uppercase,
+.stat-card.bg-gradient-success .text-uppercase,
+.stat-card.bg-gradient-info .text-uppercase,
+.stat-card.bg-gradient-warning .text-uppercase,
+.stat-card.bg-gradient-red .text-uppercase,
+.stat-card.bg-gradient-blue .text-uppercase,
+.stat-card.bg-gradient-green .text-uppercase,
+.stat-card.bg-gradient-primary .small,
+.stat-card.bg-gradient-success .small,
+.stat-card.bg-gradient-info .small,
+.stat-card.bg-gradient-warning .small,
+.stat-card.bg-gradient-red .small,
+.stat-card.bg-gradient-blue .small,
+.stat-card.bg-gradient-green .small {
+    color: rgba(255, 255, 255, 0.82);
 }
 
 .notice-item {
