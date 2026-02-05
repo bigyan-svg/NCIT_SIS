@@ -1,13 +1,14 @@
 {% extends 'admin_dash.html' %}
 {% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Confirm Force Delete Student</h3>
+        <a href="{{ url_for('manage_students') }}" class="btn btn-sm btn-dark">Back to Students</a>
+    </div>
 
-<div class="header">
-    <h3>Confirm Force Delete Student</h3>
-    <a href="{{ url_for('manage_students') }}" class="badge bg-dark">Back to Students</a>
-</div>
-
-<div class="card">
-    <div style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 8px; margin-bottom: 20px;">
+    <div class="card">
+        <div class="card-body">
+            <div class="confirm-panel">
         <p><strong>Warning: This action is irreversible and will permanently delete the student and ALL related data!</strong></p>
         
         <ul style="margin: 15px 0;">
@@ -28,17 +29,18 @@
         {% else %}
         <p>No related records found.</p>
         {% endif %}
-    </div>
+        </div>
 
-    <form method="POST">
-        <button type="submit" style="background: #dc3545; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 1.1em;">
-            Confirm: Delete Student & All Related Data
-        </button>
-        <a href="{{ url_for('manage_students') }}" 
-           style="margin-left: 15px; padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 6px;">
-            Cancel
-        </a>
-    </form>
+            <form method="POST" class="confirm-actions">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Confirm: Delete Student & All Related Data
+                </button>
+                <a href="{{ url_for('manage_students') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

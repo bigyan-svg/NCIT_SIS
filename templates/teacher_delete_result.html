@@ -1,13 +1,14 @@
 {% extends 'teacher_dash.html' %}
 {% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Confirm Delete Result</h3>
+        <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="btn btn-sm btn-dark">Back to Grading</a>
+    </div>
 
-<div class="header">
-    <h3>Confirm Delete Result</h3>
-    <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="badge bg-dark">Back to Grading</a>
-</div>
-
-<div class="card">
-    <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+    <div class="card">
+        <div class="card-body">
+            <div class="confirm-panel">
         <p><strong>Are you sure you want to permanently delete this result?</strong> This action cannot be undone.</p>
         
         <ul style="list-style: none; padding: 0; margin: 15px 0;">
@@ -20,17 +21,18 @@
             </li>
             <li><strong>GPA:</strong> <strong>{{ gpa }}</strong></li>
         </ul>
-    </div>
+        </div>
 
-    <form method="POST">
-        <button type="submit" class="badge bg-red" style="font-size: 1em; padding: 10px 20px;">
-            Confirm Delete
-        </button>
-        <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" 
-           class="badge bg-dark" style="font-size: 1em; padding: 10px 20px; margin-left: 10px;">
-            Cancel
-        </a>
-    </form>
+            <form method="POST" class="confirm-actions">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Confirm Delete
+                </button>
+                <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
