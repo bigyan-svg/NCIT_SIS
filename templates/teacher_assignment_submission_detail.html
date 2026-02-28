@@ -1,0 +1,124 @@
+{% extends 'teacher_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Private Submission Thread</h3>
+            <p class="text-muted small mb-0">
+                <span class="fw-bold text-primary">{{ student.full_name }}</span>
+                <span class="text-secondary">| {{ assignment.title }}</span>
+            </p>
+        </div>
+        <a href="{{ url_for('teacher_assignment_submissions', assignment_id=assignment.assignment_id) }}" class="btn btn-outline-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to Submissions
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 16px;">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-info-circle me-2 text-primary"></i>Submission Details</h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-2"><span class="fw-bold">Course:</span> {{ assignment.course_code }} - {{ assignment.course_name }}</div>
+                    <div class="mb-2"><span class="fw-bold">Student Roll:</span> {{ student.roll_no or '-' }}</div>
+                    <div class="mb-2"><span class="fw-bold">Student Email:</span> {{ student.email or '-' }}</div>
+                    <div class="mb-2">
+                        <span class="fw-bold">Due:</span>
+                        {% if assignment.due_date %}
+                        {{ assignment.due_date }} {% if assignment.due_time %}{{ assignment.due_time }}{% endif %}
+                        {% else %}
+                        No due date
+                        {% endif %}
+                    </div>
+                    <div class="mb-2">
+                        <span class="fw-bold">Status:</span>
+                        {% if submission.status == 'submitted' %}
+                        <span class="badge bg-success-subtle text-success border">Submitted</span>
+                        {% elif submission.status == 'turned_in' %}
+                        <span class="badge bg-info-subtle text-info border">Turned In</span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger border">Not Submitted</span>
+                        {% endif %}
+                        {% if submission.is_late %}
+                        <span class="badge bg-warning-subtle text-warning border ms-1">Late</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-2"><span class="fw-bold">Submitted At:</span> {{ submission.submitted_at or '-' }}</div>
+                    <div class="mb-2">
+                        <span class="fw-bold">Assignment File:</span>
+                        {% if assignment.attachment_path %}
+                        <a href="{{ url_for('assignment_attachment_download', assignment_id=assignment.assignment_id) }}" class="text-decoration-none">
+                            {{ assignment.attachment_name or 'Attachment' }}
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="fw-bold">Student File:</span>
+                        {% if submission.submission_path %}
+                        <a href="{{ url_for('assignment_submission_download', submission_id=submission.submission_id) }}" class="text-decoration-none">
+                            {{ submission.submission_name or 'Submission' }}
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                <div class="card-header bg-white py-3 px-4 border-bottom">
+                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-lock me-2 text-warning"></i>Private Comments</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="p-4" style="max-height: 380px; overflow-y: auto;">
+                        {% for c in comments %}
+                        <div class="border rounded-3 p-3 mb-3 bg-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="fw-bold">
+                                    {{ c.sender_name }}
+                                    {% if c.sender_role == 'teacher' %}
+                                    <span class="badge bg-primary-subtle text-primary border ms-1">Teacher</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border ms-1">Student</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ c.created_at }}</small>
+                            </div>
+                            <div class="small text-dark" style="white-space: pre-wrap;">{{ c.comment_text }}</div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted">
+                            No private comments yet.
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="border-top p-4">
+                        <form method="POST" class="row g-3">
+                            <input type="hidden" name="action" value="comment">
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted">Write Private Comment</label>
+                                <textarea name="comment_text" class="form-control" rows="3" maxlength="2000" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Post Comment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

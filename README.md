@@ -132,12 +132,16 @@ Minimum schema expected by the app (key columns):
 Schema file:
 
 - `schema.sql` includes a full MySQL dump you can import.
+- The schema now includes stricter domain checks (`CHECK`), nullability rules, and composite uniqueness for data integrity.
 
 Import example:
 
 ```bash
 mysql -u root -p ncit_sis < schema.sql
 ```
+
+If you already have an older database, re-importing `schema.sql` is the easiest way to apply all constraints.  
+Back up your data first.
 
 Seed at least one admin user, departments, and courses so dashboards have data.
 
@@ -146,6 +150,8 @@ Password security:
 - New users are stored with hashed passwords.
 - Existing plaintext passwords can still log in and will be upgraded on successful login.
 - You can also hash all existing passwords at once with `python scripts/upgrade_passwords.py`.
+- Forgot-password supports OTP delivery via SMTP email or Twilio SMS, with automatic channel fallback when possible.
+- In local testing, when delivery is unavailable, OTP can be shown in UI flash messages if `PWD_RESET_ALLOW_LOCAL_TEST_CODE=1`.
 
 ## Seed data
 
@@ -153,6 +159,19 @@ Create an admin user:
 
 ```bash
 python scripts/seed_admin.py
+```
+
+Test password-reset delivery providers:
+
+```bash
+# SMTP check
+python scripts/test_password_reset_delivery.py --email your_mail@example.com
+
+# Twilio check
+python scripts/test_password_reset_delivery.py --phone +97798XXXXXXXX
+
+# Check both in one run
+python scripts/test_password_reset_delivery.py --email your_mail@example.com --phone +97798XXXXXXXX
 ```
 
 ## Run

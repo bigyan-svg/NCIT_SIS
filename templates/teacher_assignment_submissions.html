@@ -1,0 +1,142 @@
+{% extends 'teacher_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Assignment Submissions</h3>
+            <p class="text-muted small mb-0">
+                <span class="fw-bold text-primary">{{ assignment.title }}</span>
+                <span class="text-secondary">| {{ assignment.course_code }} - {{ assignment.course_name }}</span>
+            </p>
+        </div>
+        <a href="{{ url_for('teacher_course_assignments', course_id=assignment.course_id) }}" class="btn btn-outline-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to Assignments
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-body py-3 px-4 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <div class="small">
+                {% if assignment.due_date %}
+                <span class="badge bg-light text-dark border me-2">
+                    Due: {{ assignment.due_date }} {% if assignment.due_time %}{{ assignment.due_time }}{% endif %}
+                </span>
+                {% else %}
+                <span class="badge bg-light text-secondary border me-2">No due date</span>
+                {% endif %}
+                {% if assignment.attachment_path %}
+                <a href="{{ url_for('assignment_attachment_download', assignment_id=assignment.assignment_id) }}" class="text-decoration-none">
+                    <i class="fas fa-paperclip me-1"></i>{{ assignment.attachment_name or 'Attachment' }}
+                </a>
+                {% else %}
+                <span class="text-muted">No attachment</span>
+                {% endif %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-success-subtle text-success border">Submitted: {{ stats.submitted }}</span>
+                <span class="badge bg-info-subtle text-info border">Turned In: {{ stats.turned_in }}</span>
+                <span class="badge bg-danger-subtle text-danger border">Pending: {{ stats.not_submitted }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3 border-0 bg-transparent">
+        <div class="card-body p-0">
+            <form method="GET" action="{{ url_for('teacher_assignment_submissions', assignment_id=assignment.assignment_id) }}" class="row g-2 justify-content-end">
+                <div class="col-auto">
+                    {% if search_query %}
+                    <a href="{{ url_for('teacher_assignment_submissions', assignment_id=assignment.assignment_id) }}" class="btn btn-secondary btn-sm">Clear</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input type="text" name="search_query" class="form-control" value="{{ search_query }}"
+                               placeholder="Search by name, roll no, email, DOB, status">
+                        <button class="btn btn-dark" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px;">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold text-dark"><i class="fas fa-users me-2 text-primary"></i>Student Submission Status</h6>
+            <span class="badge bg-light text-dark border">{{ submissions|length }} Students</span>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th class="ps-4 py-3">Student</th>
+                            <th>Status</th>
+                            <th>Submitted At</th>
+                            <th>File</th>
+                            <th class="text-end pe-4">Private Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in submissions %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-semibold text-dark">{{ s.full_name }}</div>
+                                <div class="small text-muted">
+                                    Roll: {{ s.roll_no or '-' }} | DOB: {{ s.date_of_birth or '-' }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if s.submission_status == 'submitted' %}
+                                <span class="badge bg-success-subtle text-success border">Submitted</span>
+                                {% elif s.submission_status == 'turned_in' %}
+                                <span class="badge bg-info-subtle text-info border">Turned In</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger border">Not Submitted</span>
+                                {% endif %}
+                                {% if s.is_late %}
+                                <span class="badge bg-warning-subtle text-warning border ms-1">Late</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="small text-muted">{{ s.submitted_at or '-' }}</span>
+                            </td>
+                            <td>
+                                {% if s.submission_id and s.submission_name %}
+                                <a href="{{ url_for('assignment_submission_download', submission_id=s.submission_id) }}" class="text-decoration-none">
+                                    <i class="fas fa-file-arrow-down me-1"></i>{{ s.submission_name }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">No file</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{{ url_for('teacher_assignment_submission_detail', assignment_id=assignment.assignment_id, student_id=s.user_id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-comments me-1"></i>Open
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                {% if search_query %}
+                                No student matched "{{ search_query }}".
+                                {% else %}
+                                No enrolled students found for this course.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'student_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">My Assignments</h3>
+            <p class="text-muted small mb-0">View assignments, notices, due dates, and your submission status across all courses.</p>
+        </div>
+        <div class="d-none d-md-flex gap-2">
+            <span class="badge bg-light text-dark border">Total: {{ stats.total }}</span>
+            <span class="badge bg-success-subtle text-success border">Submitted: {{ stats.submitted }}</span>
+            <span class="badge bg-info-subtle text-info border">Turned In: {{ stats.turned_in }}</span>
+            <span class="badge bg-danger-subtle text-danger border">Pending: {{ stats.not_submitted }}</span>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3 border-0 bg-transparent">
+        <div class="card-body p-0">
+            <form method="GET" action="{{ url_for('student_assignments') }}" class="row g-2 justify-content-end">
+                <div class="col-auto">
+                    {% if search_query %}
+                    <a href="{{ url_for('student_assignments') }}" class="btn btn-secondary btn-sm">Clear</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="search_query" class="form-control" value="{{ search_query }}"
+                               placeholder="Search by title, course, teacher, notice, status, due date">
+                        <button class="btn btn-dark" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px;">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold text-dark"><i class="fas fa-tasks me-2 text-primary"></i>Assignments by Course</h6>
+            <span class="badge bg-light text-dark border">{{ assignments|length }} Entries</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th class="ps-4 py-3">Assignment</th>
+                            <th>Course / Teacher</th>
+                            <th>Due Date & Time</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assignments %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-semibold text-dark">{{ a.title }}</div>
+                                <div class="small text-muted">
+                                    {{ (a.notice or a.description or '-')[:110] }}{% if (a.notice or a.description or '')|length > 110 %}...{% endif %}
+                                </div>
+                                <div class="small mt-1">
+                                    {% if a.attachment_path %}
+                                    <a href="{{ url_for('assignment_attachment_download', assignment_id=a.assignment_id) }}" class="text-decoration-none">
+                                        <i class="fas fa-paperclip me-1"></i>{{ a.attachment_name or 'Attachment' }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">No attachment</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">{{ a.course_code }} - {{ a.course_name }}</div>
+                                <div class="small text-muted">{{ a.teacher_name }}</div>
+                            </td>
+                            <td>
+                                {% if a.due_date %}
+                                <span class="badge bg-light text-dark border">
+                                    {{ a.due_date }} {% if a.due_time %}{{ a.due_time }}{% endif %}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-light text-secondary border">No due date</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a.submission_status == 'submitted' %}
+                                <span class="badge bg-success-subtle text-success border">Submitted</span>
+                                {% elif a.submission_status == 'turned_in' %}
+                                <span class="badge bg-info-subtle text-info border">Turned In</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger border">Not Submitted</span>
+                                {% endif %}
+                                {% if a.is_late %}
+                                <span class="badge bg-warning-subtle text-warning border ms-1">Late</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{{ url_for('student_assignment_detail', assignment_id=a.assignment_id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Open
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                {% if search_query %}
+                                No assignments matched "{{ search_query }}".
+                                {% else %}
+                                No assignments found. Ask your teachers to post assignments for enrolled courses.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

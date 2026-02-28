@@ -3,13 +3,14 @@
 {% block title %}Student Portal | Enrollment{% endblock %}
 
 {% block sidebar %}
-    <li><a href="{{ url_for('student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
-    <li><a href="{{ url_for('student_enroll') }}" class="active"><i class="fas fa-edit"></i> Enroll Course</a></li>
-    <li><a href="{{ url_for('student_results') }}"><i class="fas fa-graduation-cap"></i> Results</a></li>
-    <li><a href="{{ url_for('student_attendance') }}"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
-    <li><a href="{{ url_for('student_fees') }}"><i class="fas fa-receipt"></i> Fees</a></li>
-    <li><a href="{{ url_for('student_exams') }}"><i class="fas fa-calendar-alt"></i> Exam Schedule</a></li>
-    <li><a href="{{ url_for('library_view') }}"><i class="fas fa-book"></i> Library</a></li>
+    <li><a href="{{ url_for('student_dashboard') }}" class="{{ 'active' if request.endpoint == 'student_dashboard' else '' }}"><i class="fas fa-home"></i> Dashboard</a></li>
+    <li><a href="{{ url_for('student_enroll') }}" class="{{ 'active' if request.endpoint == 'student_enroll' else '' }}"><i class="fas fa-edit"></i> Enroll Course</a></li>
+    <li><a href="{{ url_for('student_assignments') }}" class="{{ 'active' if request.endpoint in ['student_assignments', 'student_assignment_detail'] else '' }}"><i class="fas fa-tasks"></i> Assignments</a></li>
+    <li><a href="{{ url_for('student_results') }}" class="{{ 'active' if request.endpoint == 'student_results' else '' }}"><i class="fas fa-graduation-cap"></i> Results</a></li>
+    <li><a href="{{ url_for('student_attendance') }}" class="{{ 'active' if request.endpoint == 'student_attendance' else '' }}"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+    <li><a href="{{ url_for('student_fees') }}" class="{{ 'active' if request.endpoint == 'student_fees' else '' }}"><i class="fas fa-receipt"></i> Fees</a></li>
+    <li><a href="{{ url_for('student_exams') }}" class="{{ 'active' if request.endpoint == 'student_exams' else '' }}"><i class="fas fa-calendar-alt"></i> Exam Schedule</a></li>
+    <li><a href="{{ url_for('library_view') }}" class="{{ 'active' if request.endpoint in ['library_view', 'student_borrow_book', 'student_return_book'] else '' }}"><i class="fas fa-book"></i> Library</a></li>
 {% endblock %}
 
 {% block content %}

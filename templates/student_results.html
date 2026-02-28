@@ -6,20 +6,48 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-dark mb-1">Academic Transcript</h3>
-            <p class="text-muted small mb-0">Official record of your examination results.</p>
+            <p class="text-muted small mb-0">Verify your identity to view transcript details.</p>
         </div>
+        {% if verified %}
         <div>
             <button onclick="window.print()" class="btn btn-dark shadow-sm d-print-none">
                 <i class="fas fa-print me-2"></i>Print Transcript
             </button>
         </div>
+        {% endif %}
     </div>
 
+    <div class="card shadow-sm border-0 mb-4 d-print-none" style="border-radius: 16px;">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h6 class="m-0 fw-bold text-dark"><i class="fas fa-lock me-2 text-primary"></i>Verification Required</h6>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Roll Number</label>
+                    <input type="text" name="roll_no" class="form-control" value="{{ entered_roll_no }}" placeholder="Enter your roll number" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Date of Birth</label>
+                    <input type="date" name="date_of_birth" class="form-control" value="{{ entered_dob }}" required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>View Transcript
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if verified %}
     <div class="card shadow-sm border-0" id="transcript-card" style="border-radius: 16px; overflow: hidden;">
-        
         <div class="card-header bg-white py-4 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="m-0 fw-bold text-primary"><i class="fas fa-certificate me-2"></i>Grade Sheet</h5>
-            <span class="badge bg-light text-dark border">Generated: {{ now|default('Today') }}</span>
+            <div>
+                <h5 class="m-0 fw-bold text-primary"><i class="fas fa-certificate me-2"></i>Transcript Sheet</h5>
+                <small class="text-muted">{{ student.full_name }} | Roll: {{ student.roll_no }}</small>
+            </div>
+            <span class="badge bg-light text-dark border">Generated: {{ generated_on }}</span>
         </div>
 
         <div class="card-body p-0">
@@ -27,56 +55,42 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light text-muted small text-uppercase">
                         <tr>
-                            <th class="ps-4 py-3">Course Code</th>
-                            <th style="width: 30%;">Course Title</th>
-                            <th>Exam Type</th>
-                            <th class="text-center">Score / Total</th>
-                            <th class="text-center">Grade</th>
-                            <th class="text-end pe-4">GPA</th>
+                            <th class="ps-4 py-3">Subject Code</th>
+                            <th>Subject Title</th>
+                            <th class="text-center">Academic Year</th>
+                            <th class="text-center">Semester</th>
+                            <th>Program</th>
+                            <th class="text-center">Credit Hour</th>
+                            <th class="text-center">Total GPA</th>
+                            <th class="text-center">Achieved GPA</th>
+                            <th class="text-end pe-4">Weighted GPA</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for r in results %}
+                        {% for row in transcript_rows %}
                         <tr>
-                            <td class="ps-4">
-                                <span class="font-monospace text-secondary">{{ r[0] }}</span>
-                            </td>
-                            
-                            <td>
-                                <span class="fw-bold text-dark">{{ r[1] }}</span>
-                            </td>
-                            
-                            <td>
-                                <span class="badge bg-light text-secondary border fw-normal">{{ r[6] }}</span>
-                            </td>
-
+                            <td class="ps-4"><span class="font-monospace text-secondary">{{ row.course_code }}</span></td>
+                            <td class="fw-bold text-dark">{{ row.course_name }}</td>
+                            <td class="text-center">{{ row.academic_year }}</td>
+                            <td class="text-center">{{ row.semester or student.semester or 'N/A' }}</td>
+                            <td>{{ row.program_name or 'N/A' }}</td>
+                            <td class="text-center">{{ row.credit_hour }}</td>
+                            <td class="text-center">{{ row.total_gpa }}</td>
                             <td class="text-center">
-                                <span class="fw-bold text-dark">{{ r[2] }}</span>
-                                <span class="text-muted small mx-1">/</span>
-                                <span class="text-muted small">{{ r[3] }}</span>
-                            </td>
-
-                            <td class="text-center">
-                                {% set is_pass = (r[4] != 'F') %}
-                                <span class="badge {{ 'bg-success bg-opacity-10 text-success border-success' if is_pass else 'bg-danger bg-opacity-10 text-danger border-danger' }} border px-3 rounded-pill">
-                                    {{ r[4] }}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">
+                                    {{ row.achieved_gpa }}
                                 </span>
                             </td>
-
-                            <td class="text-end pe-4">
-                                <span class="fw-bold fs-6 {{ 'text-dark' if is_pass else 'text-danger' }}">
-                                    {{ r[5] }}
-                                </span>
-                            </td>
+                            <td class="text-end pe-4 fw-bold">{{ row.weighted_gpa }}</td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="mb-3">
                                     <i class="fas fa-file-alt fa-3x text-muted opacity-25"></i>
                                 </div>
-                                <h6 class="fw-bold text-muted">No Results Available</h6>
-                                <p class="small text-muted mb-0">Results have not been published yet.</p>
+                                <h6 class="fw-bold text-muted">No Transcript Records</h6>
+                                <p class="small text-muted mb-0">No result records were found for your account.</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -86,32 +100,34 @@
         </div>
 
         <div class="card-footer bg-white border-top py-3 px-4">
-            <div class="row">
-                <div class="col-md-6 text-muted small">
-                    <i class="fas fa-info-circle me-1"></i> Grading Scale: 4.0 (A) to 0.0 (F)
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <div class="small text-muted">Total Credit Hours</div>
+                    <div class="fw-bold">{{ total_credit_hours }}</div>
                 </div>
-                <div class="col-md-6 text-end small fw-bold text-uppercase text-muted">
-                    End of Report
+                <div class="col-md-4">
+                    <div class="small text-muted">Total Weighted GPA</div>
+                    <div class="fw-bold">{{ total_weighted_gpa }}</div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="small text-muted">Average GPA</div>
+                    <div class="fw-bold text-primary fs-5">{{ weighted_average_gpa }}</div>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
+
 </div>
 
 <style>
-    /* Print Specific Styles */
     @media print {
-        /* Hide everything by default */
         body * {
             visibility: hidden;
         }
-        
-        /* Unhide the Transcript Card and its children */
         #transcript-card, #transcript-card * {
             visibility: visible;
         }
-
-        /* Position the card to fill the page */
         #transcript-card {
             position: absolute;
             left: 0;
@@ -122,15 +138,6 @@
             border: none !important;
             box-shadow: none !important;
         }
-
-        /* Ensure background colors (badges) print correctly */
-        .badge {
-            border: 1px solid #000 !important; /* Force border for contrast */
-            color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-        }
-
-        /* Hide buttons specifically */
         .btn, .d-print-none {
             display: none !important;
         }

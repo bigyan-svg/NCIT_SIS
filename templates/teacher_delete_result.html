@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Confirm Delete Result</h3>
-        <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="btn btn-sm btn-dark">Back to Grading</a>
+        <a href="{{ url_for('teacher_enter_result', course_id=course_id, exam_type=selected_exam_type if selected_exam_type else None, academic_year=selected_academic_year if selected_academic_year else None, search_query=search_query if search_query else None) }}" class="btn btn-sm btn-dark">Back to Grading</a>
     </div>
 
     <div class="card">
@@ -15,6 +15,7 @@
             <li><strong>Course:</strong> {{ course_name }}</li>
             <li><strong>Student:</strong> {{ student_name }}</li>
             <li><strong>Exam Type:</strong> <span class="badge bg-orange">{{ exam_type }}</span></li>
+            <li><strong>Academic Year:</strong> {{ academic_year }}</li>
             <li><strong>Marks Obtained:</strong> {{ marks_obtained }} / {{ full_marks }}</li>
             <li><strong>Grade:</strong> 
                 <span class="badge {{ 'bg-green' if grade != 'F' else 'bg-red' }}">{{ grade }}</span>
@@ -24,10 +25,13 @@
         </div>
 
             <form method="POST" class="confirm-actions">
+                <input type="hidden" name="exam_type" value="{{ selected_exam_type }}">
+                <input type="hidden" name="academic_year" value="{{ selected_academic_year if selected_academic_year else '' }}">
+                <input type="hidden" name="search_query" value="{{ search_query }}">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash-alt me-2"></i>Confirm Delete
                 </button>
-                <a href="{{ url_for('teacher_enter_result', course_id=course_id) }}" class="btn btn-secondary">
+                <a href="{{ url_for('teacher_enter_result', course_id=course_id, exam_type=selected_exam_type if selected_exam_type else None, academic_year=selected_academic_year if selected_academic_year else None, search_query=search_query if search_query else None) }}" class="btn btn-secondary">
                     Cancel
                 </a>
             </form>

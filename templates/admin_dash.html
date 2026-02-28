@@ -9,6 +9,7 @@
     <li><a href="{{ url_for('assign_course') }}"><i class="fas fa-link"></i> Assign</a></li>
         
     <li><a href="{{ url_for('manage_exams') }}"><i class="fas fa-clock"></i> Exams</a></li>
+    <li><a href="{{ url_for('admin_results') }}"><i class="fas fa-clipboard-check"></i> Results</a></li>
     <li><a href="{{ url_for('manage_fees') }}"><i class="fas fa-money-bill"></i> Fees</a></li>
     <li><a href="{{ url_for('manage_notices') }}"><i class="fas fa-bullhorn"></i> Notices</a></li>
     <li><a href="{{ url_for('admin_library') }}"><i class="fas fa-book-open"></i> Library</a></li>
@@ -149,6 +150,10 @@
                     <a href="{{ url_for('manage_fees') }}" class="btn-quick text-decoration-none">
                         <i class="fas fa-file-invoice text-danger"></i>
                         <span>Generate Fee Invoice</span>
+                    </a>
+                    <a href="{{ url_for('admin_results') }}" class="btn-quick text-decoration-none">
+                        <i class="fas fa-clipboard-check text-info"></i>
+                        <span>Enter Results</span>
                     </a>
                 </div>
             </div>

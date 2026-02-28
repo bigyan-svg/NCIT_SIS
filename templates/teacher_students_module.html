@@ -1,0 +1,86 @@
+{% extends 'teacher_dash.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Student Module</h3>
+            <p class="text-muted small mb-0">Students enrolled in your assigned courses.</p>
+        </div>
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-outline-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-3 border-0 bg-transparent">
+        <div class="card-body p-0">
+            <form method="GET" action="{{ url_for('teacher_students_module') }}" class="row g-2 justify-content-end">
+                <div class="col-auto">
+                    {% if search_query %}
+                    <a href="{{ url_for('teacher_students_module') }}" class="btn btn-secondary btn-sm">Clear</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input type="text" name="search_query" class="form-control" value="{{ search_query }}"
+                               placeholder="Search by name, roll no, DOB, email, course code...">
+                        <button class="btn btn-dark" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 16px;">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold text-dark"><i class="fas fa-users me-2 text-info"></i>My Course Students</h6>
+            <span class="badge bg-light text-dark border">{{ students|length }} Students</span>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th class="ps-4 py-3">Student</th>
+                            <th>Roll No</th>
+                            <th>Email</th>
+                            <th>Semester</th>
+                            <th>DOB</th>
+                            <th class="text-center">Course Count</th>
+                            <th>Courses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td class="ps-4 fw-semibold">{{ s.full_name }}</td>
+                            <td>{{ s.roll_no or '-' }}</td>
+                            <td>{{ s.email or '-' }}</td>
+                            <td>{{ s.semester or '-' }}</td>
+                            <td>{{ s.date_of_birth or '-' }}</td>
+                            <td class="text-center">{{ s.assigned_course_count }}</td>
+                            <td><small>{{ s.assigned_courses or '-' }}</small></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                {% if search_query %}
+                                No students matched "{{ search_query }}".
+                                {% else %}
+                                No students found for your assigned courses.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
